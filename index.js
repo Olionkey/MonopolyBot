@@ -35,7 +35,7 @@ if (cluster.isMaster) {
     const config = require("./config.json").general;
     const Discord = require("discord.js");
     const client = new Discord.Client();
-    const cards = require('presisant_data/Monopolycards.json');
+    const cards = require('./persistant_data/MonopolyCards.json');
 
     let fs = require('fs');
     let game = false;
