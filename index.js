@@ -34,7 +34,8 @@ if (cluster.isMaster) {
   const config         = require("./config.json").general;
   const Discord        = require("discord.js");
   const client         = new Discord.Client();
-
+  const cards          = require('./Monopolycards.json');
+  
   let fs               = require('fs');
 
 
@@ -74,6 +75,11 @@ if (cluster.isMaster) {
       case 'r':
         console.log("Reload time!");
         process.exit(0);
+      break;
+
+      
+      case 'testcards':
+          return message.channel.send(cards.MediterraneanAvenue.color);
       break;
 
       default:

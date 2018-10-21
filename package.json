@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/Olionkey/MonopolyBot#readme",
   "dependencies": {
+    "cluster": "^0.7.7",
     "discord.js": "^11.4.2"
   },
   "description": ""
