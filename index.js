@@ -41,7 +41,8 @@ if (cluster.isMaster) {
     let game = false;
     let playercount = 0;
     let joinable = true;
-    let lobby = []
+    let lobby = [],
+        CGID  = []; // Current Game Ids
 
 
 
@@ -75,6 +76,8 @@ if (cluster.isMaster) {
         /* Then later on it is stored in command .*/
         const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
         const command = args.shift().toLowerCase();
+        const guildMember = message.member; //Helps add roles to users.
+        const combWord = args.join(' ');
         /* what calls the bot for a command */
         
         
@@ -112,7 +115,26 @@ if (cluster.isMaster) {
                 return message.channel.send("game is already started please don't start another game.");
               game = true;
               message.channel.send ("Game has started.")
+              
+              let inRay = false;
+              do{
+                inRay = false;
+                let testGameId = Math.floor(Math.random() * 10000);
+                for ( let i = 0 ; i < CGID.length; i ++)
+                  if ( CGID[i] === testGameID)
+                    inRay = true;
+                if (!inRay)
+                  CGID[CGID.length] = testGameId;
+              }while (inRay);
+              
+              message.guild.createRole({
+                name: `lobby#${CGID[CGID.length-1]}`,
+                hoist: true,
+                mentionable: true,
+              })      
+            
             break;
+
 
             case 'play':
               // Checks to see if the game has to started if not then no one can join.
@@ -127,30 +149,54 @@ if (cluster.isMaster) {
 
                 message.reply ("Welcome to the lobby please wait, while we gather more players!");
                 lobby[lobby.length] = message.author.id;
+                //console.log(CGID);
+                let roleName = `lobby#${CGID[CGID.length - 1]}`;
+                let role = message.guild.roles.find(r => r.id !== message.guild.id && r.name == roleName);
+
+                let endpoint = require('discord.js').Constants.Endpoints.Guild(message.guild).toString() + '/roles';
+                 message.client.rest.makeRequest('get', endpoint, true).then(roles => roles.map(r => r.name + ': ' + r.id))
+                console.log("This is the endpoint" + endpoint);
+                console.log("\n\n\nThis is the map of the roles." )
+                console.log(message.guild.roles.map(r => r.name + ": " + r.id));
+                guildMember.addRole(role).catch(()=>console.error("adding role"));
               }
               if (lobby.length > 1)
                 setTimeout(function(){
                   message.reply("Game has started! Enjoy!!");
                 }, 60000)
             break;
-
-          
-          case 'gr':
-            message.guild.createRole({
-              data:{
-                name : 'test',
-                hoist: true,
-                mentionable: true,
-              },
-            });
-            var foo = message.guild.roles.find (r => r.name === 'test');
-                message.member.addRole(foo);
-          break;
                 
-         
+            case 'f':
+              let f = message.guild.roles;
+                console.log(f.name);
+            break;
+            case 'endgame':
+              let roleName 
+              for (let i = 0; i < CGID.length; i ++)
+                if (CGID[i] === combWord){
+                  roleName = `lobby#${CGID[i]}`;
+                  return;
+                }
+              if (roleName === undefined)
+                return message.channel.send("Sorry that game number does not exist.");      
+              
+              let role = message.guild.roles.find(r => r.name == roleName);
+                role.delete('good night')
+                  .then(deleted => console.log (`Deleted role ${deleted.name}`))
+                  .catch(console.error);
+            break;
 
+            case'endall':
+              for (let i = 0 ; i < CGID.length; i ++){
+                let roleName = `lobby#${CGID[i]}`;
+                let role = message.guild.roles.find(r => r.name == roleName);
+                role.delete('good night')
+                  .then(deleted => console.log(`Deleted role ${deleted.name}`))
+                  .catch(console.error);
+              }
+            break;
             default:
-                return message.reply("That is no command.");
+                //return message.reply("That is no command.");
                 break;
         }
         

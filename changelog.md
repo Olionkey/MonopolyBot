@@ -4,6 +4,7 @@
 ## [Unrealeased]
 
 ### Added
+- Players will now be added to a game library when they start the game.
 - The game has awoken and has the sky ( the night at least ).
 - Have added functionality to start a lobby, and to join the lobby.
 - Also have added the functionality to roll the dice.
