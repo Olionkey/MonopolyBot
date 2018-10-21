@@ -35,12 +35,12 @@ if (cluster.isMaster) {
   const Discord        = require("discord.js");
   const client         = new Discord.Client();
 
-  var fs               = require('fs'),
+  let fs               = require('fs');
 
 
 
   /*Start bot */
-  client.login(auth.token)
+  client.login(auth.token);
   client.on("ready" , () => {
     console.log(`Bot has started, with ${client.users.size} users, in ${client.channels.size} channels of ${client.guilds.size} guilds.`);
     const member = client.channels.get(config.statusChannelID);
@@ -59,7 +59,7 @@ if (cluster.isMaster) {
   /* Will run when it sees a message */
   client.on("message", async message =>{
     /* Will ignore it self */
-    if(message.author.bot)
+    if(message.author.bot) return;
 
     //Will search for the prefix for the bot to function
     if(message.content.indexOf(config.prefix) !== 0) return;
