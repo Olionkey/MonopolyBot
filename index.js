@@ -134,7 +134,18 @@ if (cluster.isMaster) {
                 }, 60000)
             break;
 
-
+          
+          case 'gr':
+            message.guild.createRole({
+              data:{
+                name : 'test',
+                hoist: true,
+                mentionable: true,
+              },
+            });
+            var foo = message.guild.roles.find (r => r.name === 'test');
+                message.member.addRole(foo);
+          break;
                 
          
 
