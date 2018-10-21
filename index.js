@@ -10,7 +10,7 @@ if (cluster.isMaster) {
         cluster.fork();
     }
 
-    console.log("Master PID is " + process.pid)
+    console.log("Master PID is " + process.pid);
 
     cluster.on('exit', function (deadWorker, code, signal) {
         /* Restart the worker */
@@ -28,14 +28,16 @@ if (cluster.isMaster) {
 } else {
 
     /* This is the PID of the new generated process. It doesn't show the 'worker PID born' at startup */
-    console.log("Spawned with PID " + process.pid)
+    console.log("Spawned with PID " + process.pid);
 
     /* Required Files */
     const auth = require("./auth.json");
     const config = require("./config.json").general;
     const Discord = require("discord.js");
     const client = new Discord.Client();
+    const updateJsonFile = require('update-json-file');
     const cards = require('./persistant_data/MonopolyCards.json');
+    const roleFunction = require('./modules.js');
 
     let fs = require('fs');
     let game = false;
@@ -66,7 +68,7 @@ if (cluster.isMaster) {
     /* Will run when it sees a message */
     client.on("message", async message => {
         /* Will ignore it self */
-        if (message.author.bot) return;
+        if (message.author.bot ) return;
 
         //Will search for the prefix for the bot to function
         if (message.content.indexOf(config.prefix) !== 0) return;
@@ -115,18 +117,22 @@ if (cluster.isMaster) {
                 return message.channel.send("game is already started please don't start another game.");
               game = true;
               message.channel.send ("Game has started.")
-              
+            
               let inRay = false;
+              // Purpose of the loop is to check if the randomly generated CGID has been used yet, if so make a new ID
               do{
                 inRay = false;
                 let testGameId = Math.floor(Math.random() * 10000);
+
                 for ( let i = 0 ; i < CGID.length; i ++)
                   if ( CGID[i] === testGameID)
                     inRay = true;
                 if (!inRay)
                   CGID[CGID.length] = testGameId;
+
               }while (inRay);
               
+              // Will create a role with the last number generated.
               message.guild.createRole({
                 name: `lobby#${CGID[CGID.length-1]}`,
                 hoist: true,
@@ -135,7 +141,7 @@ if (cluster.isMaster) {
             
             break;
 
-
+            case 'join':
             case 'play':
               // Checks to see if the game has to started if not then no one can join.
               if(!game)
@@ -149,34 +155,43 @@ if (cluster.isMaster) {
 
                 message.reply ("Welcome to the lobby please wait, while we gather more players!");
                 lobby[lobby.length] = message.author.id;
-                //console.log(CGID);
+
                 let roleName = `lobby#${CGID[CGID.length - 1]}`;
+                // Makes sure the guild id and role id do not match. Had some issues where they did.
                 let role = message.guild.roles.find(r => r.id !== message.guild.id && r.name == roleName);
 
-                let endpoint = require('discord.js').Constants.Endpoints.Guild(message.guild).toString() + '/roles';
-                 message.client.rest.makeRequest('get', endpoint, true).then(roles => roles.map(r => r.name + ': ' + r.id))
-                console.log("This is the endpoint" + endpoint);
-                console.log("\n\n\nThis is the map of the roles." )
-                console.log(message.guild.roles.map(r => r.name + ": " + r.id));
                 guildMember.addRole(role).catch(()=>console.error("adding role"));
               }
-              if (lobby.length > 1)
+              // If the player count is greater 1 then the game will start in x amount of minutes.
+              if (lobby.length > 0)
                 setTimeout(function(){
                   message.reply("Game has started! Enjoy!!");
-                }, 60000)
+                  game = false;
+                  lobby = [];
+                }, 6000)
+
             break;
-                
-            case 'f':
-              let f = message.guild.roles;
-                console.log(f.name);
-            break;
+
             case 'endgame':
-              let roleName 
-              for (let i = 0; i < CGID.length; i ++)
+              let roleName;
+              
+              if(parseInt(combWord) === NaN){
+                message.channel.send("Sorry but that is not a number, please insert a number.")
+                console.log(NaN);
+                break;
+              }
+              else
+                parseInt(combWord);
+              console.log(CGID);
+              console.log("\n\n" + combWord);
+              for (let i = 0; i < CGID.length; i ++){
                 if (CGID[i] === combWord){
+                  console.log ("Got a match");
                   roleName = `lobby#${CGID[i]}`;
                   return;
                 }
+              }
+
               if (roleName === undefined)
                 return message.channel.send("Sorry that game number does not exist.");      
               
@@ -184,17 +199,22 @@ if (cluster.isMaster) {
                 role.delete('good night')
                   .then(deleted => console.log (`Deleted role ${deleted.name}`))
                   .catch(console.error);
+
             break;
 
             case'endall':
-              for (let i = 0 ; i < CGID.length; i ++){
-                let roleName = `lobby#${CGID[i]}`;
-                let role = message.guild.roles.find(r => r.name == roleName);
-                role.delete('good night')
+              let lobbyRole = roleFunction.getLobbyRole(message);
+              let rolep = '';
+               for(let i = 0 ; i < lobbyRole.length; i ++){
+               rolep = message.guild.roles.find(r => r.name == lobbyRole[i]);
+                rolep.delete('good night')
                   .then(deleted => console.log(`Deleted role ${deleted.name}`))
                   .catch(console.error);
               }
+              message.channel.send ("All lobby roles have been deleted.");
+              game = false;
             break;
+
             default:
                 //return message.reply("That is no command.");
                 break;

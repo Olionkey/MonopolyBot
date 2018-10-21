@@ -4,6 +4,7 @@
 ## [Unrealeased]
 
 ### Added
+- !endall will now delete all current roles given to player. !endgame for specific games is still broken needs to be fixed.
 - Players will now be added to a game library when they start the game.
 - The game has awoken and has the sky ( the night at least ).
 - Have added functionality to start a lobby, and to join the lobby.
