@@ -80,8 +80,11 @@ if (cluster.isMaster) {
 
       
       case 'testcards':
-          console.log(combWord);
-          return message.channel.send(cards.combWord);
+          // console.log(combWord);
+          // return message.channel.send(cards[combWord]);
+          var code = "message.channel.send(cards.";
+          code = code + combWord + ")";
+          eval(code);
       break;
 
       default:
