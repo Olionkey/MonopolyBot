@@ -26,6 +26,7 @@ if (cluster.isMaster) {
     });
 
 } else {
+
     /* This is the PID of the new generated process. It doesn't show the 'worker PID born' at startup */
     console.log("Spawned with PID " + process.pid)
 
@@ -84,8 +85,10 @@ if (cluster.isMaster) {
 
 
             case 'testcards':
-                return message.channel.send(cards.MediterraneanAvenue.color);
-                break;
+                var code = "message.channel.send(cards.";
+                code = code + combWord + ")";
+                 eval(code);
+            break;
             
             case 'roll':
                 message.reply('You rolled a ' + Math.floor(Math.random()* 7));
