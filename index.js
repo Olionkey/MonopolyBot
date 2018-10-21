@@ -70,6 +70,7 @@ if (cluster.isMaster) {
     /* Then later on it is stored in command .*/
     const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
     const command = args.shift().toLowerCase();
+    let combWord = args.join('.'); //Combined words for anything after the command call
     /* what calls the bot for a command */
     switch(command){
       case 'r':
@@ -79,7 +80,8 @@ if (cluster.isMaster) {
 
       
       case 'testcards':
-          return message.channel.send(cards.MediterraneanAvenue.color);
+          console.log(combWord);
+          return message.channel.send(cards.combWord);
       break;
 
       default:

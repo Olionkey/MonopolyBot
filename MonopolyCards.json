@@ -90,7 +90,7 @@
     "mortage": 70
   },
 
-  "St.CharlesPlace": {
+  "StatesAvenue": {
     "rent": 10,
     "1h": 50,
     "2h": 150,
@@ -103,17 +103,17 @@
     "mortage": 70
   },
 
-  "StatesAvenue": {
-    "rent": 10,
-    "1h": 50,
-    "2h": 150,
-    "3h": 450,
-    "4h": 625,
-    "hotel": 750,
+  "VirginiaAvenue": {
+    "rent": 12,
+    "1h": 60,
+    "2h": 180,
+    "3h": 500,
+    "4h": 700,
+    "hotel": 900,
     "houseCost": 100,
     "hotelCost": 100,
     "price": 160,
-    "mortage": 70
+    "mortage": 80
   },
 
   "PennsylvaniaRailroad": {
@@ -137,5 +137,194 @@
     "hotelCost": 100,
     "price": 180,
     "mortage": 90
+  },
+
+  "TennesseeAvenue": {
+    "rent": 14,
+    "1h": 70,
+    "2h": 200,
+    "3h": 550,
+    "4h": 750,
+    "hotel": 950,
+    "houseCost": 100,
+    "hotelCost": 100,
+    "price": 180,
+    "mortage": 90
+  },
+
+  "NewYorkAvenue": {
+    "rent": 16,
+    "1h": 80,
+    "2h": 220,
+    "3h": 600,
+    "4h": 800,
+    "hotel": 1000,
+    "houseCost": 100,
+    "hotelCost": 100,
+    "price": 180,
+    "mortage": 100
+  },
+
+  "KentuckyAvenue": {
+    "rent": 18,
+    "1h": 90,
+    "2h": 250,
+    "3h": 700,
+    "4h": 875,
+    "hotel": 1050,
+    "houseCost": 150,
+    "hotelCost": 150,
+    "price": 220,
+    "mortage": 110
+  },
+
+  "IndianaAvenue": {
+    "rent": 18,
+    "1h": 90,
+    "2h": 250,
+    "3h": 700,
+    "4h": 875,
+    "hotel": 1050,
+    "houseCost": 150,
+    "hotelCost": 150,
+    "price": 220,
+    "mortage": 110
+  },
+
+  "IllinoisAvenue": {
+    "rent": 18,
+    "1h": 90,
+    "2h": 250,
+    "3h": 700,
+    "4h": 875,
+    "hotel": 1050,
+    "houseCost": 150,
+    "hotelCost": 150,
+    "price": 220,
+    "mortage": 110
+  },
+
+  "B&ORailRoad": {
+    "rent": 25,
+    "2RR": 50,
+    "3RR": 100,
+    "4RR": 200,
+    "price": 200,
+    "mortage": 100,
+    "color": "white"
+  }, 
+
+  "AtlanticAvenue": {
+    "rent": 22,
+    "1h": 110,
+    "2h": 330,
+    "3h": 800,
+    "4h": 975,
+    "hotel": 1150,
+    "houseCost": 150,
+    "hotelCost": 150,
+    "price": 260,
+    "mortage": 130
+  },
+
+  "VentorAvenue": {
+    "rent": 22,
+    "1h": 110,
+    "2h": 330,
+    "3h": 800,
+    "4h": 975,
+    "hotel": 1150,
+    "houseCost": 150,
+    "hotelCost": 150,
+    "price": 260,
+    "mortage": 130
+  },
+
+  "MarvinGardens": {
+    "rent": 24,
+    "1h": 120,
+    "2h": 360,
+    "3h": 850,
+    "4h": 1025,
+    "hotel": 1200,
+    "houseCost": 150,
+    "hotelCost": 150,
+    "price": 280,
+    "mortage": 140
+  },
+
+  "PacificAvenue": {
+    "rent": 26,
+    "1h": 130,
+    "2h": 390,
+    "3h": 900,
+    "4h": 1100,
+    "hotel": 1275,
+    "houseCost": 200,
+    "hotelCost": 200,
+    "price": 300,
+    "mortage": 150
+  },
+
+  "NorthCarolinaAvenue": {
+    "rent": 26,
+    "1h": 130,
+    "2h": 390,
+    "3h": 900,
+    "4h": 1100,
+    "hotel": 1275,
+    "houseCost": 200,
+    "hotelCost": 200,
+    "price": 300,
+    "mortage": 150
+  },
+
+  "PennsylvaniaAvenue": {
+    "rent": 28,
+    "1h": 150,
+    "2h": 450,
+    "3h": 1000,
+    "4h": 1200,
+    "hotel": 1400,
+    "houseCost": 200,
+    "hotelCost": 200,
+    "price": 320,
+    "mortage": 160
+  },
+
+  "ShortLineRailRoad": {
+    "rent": 25,
+    "2RR": 50,
+    "3RR": 100,
+    "4RR": 200,
+    "price": 200,
+    "mortage": 100,
+    "color": "white"
+  }, 
+
+  "ParkPlace": {
+    "rent": 35,
+    "1h": 175,
+    "2h": 500,
+    "3h": 1100,
+    "4h": 1300,
+    "hotel": 1500,
+    "houseCost": 200,
+    "hotelCost": 200,
+    "price": 350,
+    "mortage": 175
+  },
+
+  "Boardwalk": {
+    "rent": 50,
+    "1h": 200,
+    "2h": 600,
+    "3h": 1400,
+    "4h": 1700,
+    "hotel": 2000,
+    "houseCost": 200,
+    "hotelCost": 200,
+    "price": 350,
+    "mortage": 400
   }
 }
