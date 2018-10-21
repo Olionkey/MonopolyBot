@@ -38,6 +38,7 @@ if (cluster.isMaster) {
     const cards = require('./Monopolycards.json');
 
     let fs = require('fs');
+    let game = false;
     let playercount = 0;
     let joinable = true;
     let lobby = []
@@ -82,7 +83,9 @@ if (cluster.isMaster) {
                 console.log("Reload time!");
                 process.exit(0);
                 break;
-
+            case 'ping':
+              return message.channel.send("pong");
+            break;
 
             case 'testcards':
                 var code = "message.channel.send(cards.";
@@ -91,17 +94,49 @@ if (cluster.isMaster) {
             break;
             
             case 'roll':
-                message.reply('You rolled a ' + Math.floor(Math.random()* 7));
+              let roll1 = Math.floor(Math.random()*7);
+              let roll2 = Math.floor(Math.random()*7);
+
+              if ( roll1 === roll2 ){
+                if (/*add playerSnakeEye count ===  3 */ 1+1 === 3){
+                  //send player to jail.
+                }
+                // make it their turn again.
+                return message.reply("You rolled snake eyes, move " + roll1+roll2 + " spaces.");
+              }
+              message.reply("You have rolled, move " + roll1 + roll2 + " spaces.")
             break;
+
+            case 'start':
+              if (game)
+                return message.channel.send("game is already started please don't start another game.");
+              game = true;
+              message.channel.send ("Game has started.")
+            break;
+
             case 'play':
-                message.reply('Forming lobby . . .');
-                playercount++;
-                lobby.push(message.mentions.users.first().id);
-                break;
-            case (playercount >= 4 && lobby === message.mentions.users.first().id):
-                console.log('Unable to join');
+              // Checks to see if the game has to started if not then no one can join.
+              if(!game)
+                return message.channel.send ("Please start the game before joining.");
+              // current max lobby limit is 10, should let the server owner change it in the future.
+              if ( lobby.length < 10){
+                  // goes through the current lobby array to see if the player has joined already or not
+                  for (let i = 0 ; i < lobby.length; i ++)
+                    if(lobby[i] === message.author.id)
+                      return message.reply ("Sorry but you already joined.");
+
+                message.reply ("Welcome to the lobby please wait, while we gather more players!");
+                lobby[lobby.length] = message.author.id;
+              }
+              if (lobby.length > 1)
+                setTimeout(function(){
+                  message.reply("Game has started! Enjoy!!");
+                }, 60000)
+            break;
+
+
                 
-                
+         
 
             default:
                 return message.reply("That is no command.");
