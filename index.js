@@ -79,7 +79,7 @@ if (cluster.isMaster) {
         const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
         const command = args.shift().toLowerCase();
         const guildMember = message.member; //Helps add roles to users.
-        const combWord = args.join(' ');
+        const combWord = args.join('');
         /* what calls the bot for a command */
         
         
@@ -118,19 +118,8 @@ if (cluster.isMaster) {
               game = true;
               message.channel.send ("Game has started.")
             
-              let inRay = false;
               // Purpose of the loop is to check if the randomly generated CGID has been used yet, if so make a new ID
-              do{
-                inRay = false;
-                let testGameId = Math.floor(Math.random() * 10000);
-
-                for ( let i = 0 ; i < CGID.length; i ++)
-                  if ( CGID[i] === testGameID)
-                    inRay = true;
-                if (!inRay)
-                  CGID[CGID.length] = testGameId;
-
-              }while (inRay);
+              CGID[CGID.length - 1] = roleFunction.getNewCGID(CGID);
               
               // Will create a role with the last number generated.
               message.guild.createRole({
@@ -174,21 +163,12 @@ if (cluster.isMaster) {
 
             case 'endgame':
               let roleName;
-              
-              if(parseInt(combWord) === NaN){
-                message.channel.send("Sorry but that is not a number, please insert a number.")
-                console.log(NaN);
-                break;
-              }
-              else
-                parseInt(combWord);
-              console.log(CGID);
-              console.log("\n\n" + combWord);
+              // Searches through CGID to find which lobby to delete, if it does not exist it will thrown an error after the loop ends.
               for (let i = 0; i < CGID.length; i ++){
-                if (CGID[i] === combWord){
+                if (CGID[i] === parseInt(args[0])){
                   console.log ("Got a match");
                   roleName = `lobby#${CGID[i]}`;
-                  return;
+                  break;
                 }
               }
 
@@ -196,6 +176,7 @@ if (cluster.isMaster) {
                 return message.channel.send("Sorry that game number does not exist.");      
               
               let role = message.guild.roles.find(r => r.name == roleName);
+              // Deletes the roll after it has been found.
                 role.delete('good night')
                   .then(deleted => console.log (`Deleted role ${deleted.name}`))
                   .catch(console.error);
@@ -206,7 +187,7 @@ if (cluster.isMaster) {
               let lobbyRole = roleFunction.getLobbyRole(message);
               let rolep = '';
                for(let i = 0 ; i < lobbyRole.length; i ++){
-               rolep = message.guild.roles.find(r => r.name == lobbyRole[i]);
+                rolep = message.guild.roles.find(r => r.name == lobbyRole[i]);
                 rolep.delete('good night')
                   .then(deleted => console.log(`Deleted role ${deleted.name}`))
                   .catch(console.error);
