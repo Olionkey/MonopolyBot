@@ -10,7 +10,7 @@ if (cluster.isMaster) {
         cluster.fork();
     }
 
-    console.log("Master PID is " + process.pid)
+    console.log("Master PID is " + process.pid);
 
     cluster.on('exit', function (deadWorker, code, signal) {
         /* Restart the worker */
@@ -28,20 +28,23 @@ if (cluster.isMaster) {
 } else {
 
     /* This is the PID of the new generated process. It doesn't show the 'worker PID born' at startup */
-    console.log("Spawned with PID " + process.pid)
+    console.log("Spawned with PID " + process.pid);
 
     /* Required Files */
     const auth = require("./auth.json");
     const config = require("./config.json").general;
     const Discord = require("discord.js");
     const client = new Discord.Client();
+    const updateJsonFile = require('update-json-file');
     const cards = require('./persistant_data/MonopolyCards.json');
+    const roleFunction = require('./modules.js');
 
     let fs = require('fs');
     let game = false;
     let playercount = 0;
     let joinable = true;
-    let lobby = []
+    let lobby = [],
+        CGID  = []; // Current Game Ids
 
 
 
@@ -65,6 +68,7 @@ if (cluster.isMaster) {
     /* Will run when it sees a message */
     client.on("message", async message => {
         /* Will ignore it self */
+
         //if (message.author.bot) return;
 
         //Will search for the prefix for the bot to function
@@ -75,6 +79,8 @@ if (cluster.isMaster) {
         /* Then later on it is stored in command .*/
         const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
         const command = args.shift().toLowerCase();
+        const guildMember = message.member; //Helps add roles to users.
+        const combWord = args.join('');
         /* what calls the bot for a command */
 
 
@@ -113,6 +119,17 @@ if (cluster.isMaster) {
                 return message.channel.send("game is already started please don't start another game.");
               game = true;
               message.channel.send ("Game has started.")
+            
+              // Purpose of the loop is to check if the randomly generated CGID has been used yet, if so make a new ID
+              CGID[CGID.length - 1] = roleFunction.getNewCGID(CGID);
+              
+              // Will create a role with the last number generated.
+              message.guild.createRole({
+                name: `lobby#${CGID[CGID.length-1]}`,
+                hoist: true,
+                mentionable: true,
+              })      
+            
             break;
 
             case 'join':
@@ -129,8 +146,16 @@ if (cluster.isMaster) {
 
                 message.reply ("Welcome to the lobby please wait, while we gather more players!");
                 lobby[lobby.length] = message.author.id;
+
+                let roleName = `lobby#${CGID[CGID.length - 1]}`;
+                // Makes sure the guild id and role id do not match. Had some issues where they did.
+                let role = message.guild.roles.find(r => r.id !== message.guild.id && r.name == roleName);
+
+                guildMember.addRole(role).catch(()=>console.error("adding role"));
               }
+            
               if (lobby.length > 1) {
+              // If the player count is greater 1 then the game will start in x amount of minutes.
                 setTimeout(function(){
                   let players = ""
                   for (let i = 0 ; i < lobby.length; i ++) {
@@ -138,19 +163,56 @@ if (cluster.isMaster) {
                   }
                   players = players.substring(0, players.length - 1);
                   message.reply("Game has started! Enjoy!!");
+                  
                   playGame(players)
-                }, 10000)
-              }
+                  
+                  game = false;
+                  lobby = [];
+                10}, 6000)
+
             break;
 
+            case 'endgame':
+              let roleName;
+              // Searches through CGID to find which lobby to delete, if it does not exist it will thrown an error after the loop ends.
+              for (let i = 0; i < CGID.length; i ++){
+                if (CGID[i] === parseInt(args[0])){
+                  console.log ("Got a match");
+                  roleName = `lobby#${CGID[i]}`;
+                  break;
+                }
+              }
 
+              if (roleName === undefined)
+                return message.channel.send("Sorry that game number does not exist.");      
+              
+              let role = message.guild.roles.find(r => r.name == roleName);
+              // Deletes the roll after it has been found.
+                role.delete('good night')
+                  .then(deleted => console.log (`Deleted role ${deleted.name}`))
+                  .catch(console.error);
+
+            break;
             default:
                 return message.reply("That is no command.");
             break;
-
-    }});
-
-    async function playGame(UUID_String) {
+                
+            case'endall':
+              let lobbyRole = roleFunction.getLobbyRole(message);
+              let rolep = '';
+               for(let i = 0 ; i < lobbyRole.length; i ++){
+                rolep = message.guild.roles.find(r => r.name == lobbyRole[i]);
+                rolep.delete('good night')
+                  .then(deleted => console.log(`Deleted role ${deleted.name}`))
+                  .catch(console.error);
+              }
+              message.channel.send ("All lobby roles have been deleted.");
+              game = false;
+            break;
+        }
+        
+    });
+      async function playGame(UUID_String) {
       let players = []
       players = UUID_String.split(",");
       for (let i = 0 ; i < players.length; i ++) {
