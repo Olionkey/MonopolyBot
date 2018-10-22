@@ -68,7 +68,8 @@ if (cluster.isMaster) {
     /* Will run when it sees a message */
     client.on("message", async message => {
         /* Will ignore it self */
-        if (message.author.bot ) return;
+
+        //if (message.author.bot) return;
 
         //Will search for the prefix for the bot to function
         if (message.content.indexOf(config.prefix) !== 0) return;
@@ -81,8 +82,8 @@ if (cluster.isMaster) {
         const guildMember = message.member; //Helps add roles to users.
         const combWord = args.join('');
         /* what calls the bot for a command */
-        
-        
+
+
         switch (command) {
             case 'r':
                 console.log("Reload time!");
@@ -97,7 +98,7 @@ if (cluster.isMaster) {
                 code = code + combWord + ")";
                  eval(code);
             break;
-            
+
             case 'roll':
               let roll1 = Math.floor(Math.random()*7);
               let roll2 = Math.floor(Math.random()*7);
@@ -112,6 +113,7 @@ if (cluster.isMaster) {
               message.reply("You have rolled, move " + roll1 + roll2 + " spaces.")
             break;
 
+            case 's':
             case 'start':
               if (game)
                 return message.channel.send("game is already started please don't start another game.");
@@ -151,13 +153,22 @@ if (cluster.isMaster) {
 
                 guildMember.addRole(role).catch(()=>console.error("adding role"));
               }
+            
+              if (lobby.length > 1) {
               // If the player count is greater 1 then the game will start in x amount of minutes.
-              if (lobby.length > 0)
                 setTimeout(function(){
+                  let players = ""
+                  for (let i = 0 ; i < lobby.length; i ++) {
+                    players = players + lobby[i] + ","
+                  }
+                  players = players.substring(0, players.length - 1);
                   message.reply("Game has started! Enjoy!!");
+                  
+                  playGame(players)
+                  
                   game = false;
                   lobby = [];
-                }, 6000)
+                10}, 6000)
 
             break;
 
@@ -182,7 +193,10 @@ if (cluster.isMaster) {
                   .catch(console.error);
 
             break;
-
+            default:
+                return message.reply("That is no command.");
+            break;
+                
             case'endall':
               let lobbyRole = roleFunction.getLobbyRole(message);
               let rolep = '';
@@ -195,11 +209,15 @@ if (cluster.isMaster) {
               message.channel.send ("All lobby roles have been deleted.");
               game = false;
             break;
-
-            default:
-                //return message.reply("That is no command.");
-                break;
         }
         
     });
+      async function playGame(UUID_String) {
+      let players = []
+      players = UUID_String.split(",");
+      for (let i = 0 ; i < players.length; i ++) {
+        let debug = client.channels.get(411777884861104130)
+        debug.send(players[i])
+      }
+    }
 }
