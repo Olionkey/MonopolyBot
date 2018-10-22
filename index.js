@@ -65,7 +65,7 @@ if (cluster.isMaster) {
     /* Will run when it sees a message */
     client.on("message", async message => {
         /* Will ignore it self */
-        if (message.author.bot) return;
+        //if (message.author.bot) return;
 
         //Will search for the prefix for the bot to function
         if (message.content.indexOf(config.prefix) !== 0) return;
@@ -76,8 +76,8 @@ if (cluster.isMaster) {
         const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
         const command = args.shift().toLowerCase();
         /* what calls the bot for a command */
-        
-        
+
+
         switch (command) {
             case 'r':
                 console.log("Reload time!");
@@ -92,7 +92,7 @@ if (cluster.isMaster) {
                 code = code + combWord + ")";
                  eval(code);
             break;
-            
+
             case 'roll':
               let roll1 = Math.floor(Math.random()*7);
               let roll2 = Math.floor(Math.random()*7);
@@ -107,6 +107,7 @@ if (cluster.isMaster) {
               message.reply("You have rolled, move " + roll1 + roll2 + " spaces.")
             break;
 
+            case 's':
             case 'start':
               if (game)
                 return message.channel.send("game is already started please don't start another game.");
@@ -114,6 +115,7 @@ if (cluster.isMaster) {
               message.channel.send ("Game has started.")
             break;
 
+            case 'join':
             case 'play':
               // Checks to see if the game has to started if not then no one can join.
               if(!game)
@@ -128,20 +130,32 @@ if (cluster.isMaster) {
                 message.reply ("Welcome to the lobby please wait, while we gather more players!");
                 lobby[lobby.length] = message.author.id;
               }
-              if (lobby.length > 1)
+              if (lobby.length > 1) {
                 setTimeout(function(){
+                  let players = ""
+                  for (let i = 0 ; i < lobby.length; i ++) {
+                    players = players + lobby[i] + ","
+                  }
+                  players = players.substring(0, players.length - 1);
                   message.reply("Game has started! Enjoy!!");
-                }, 60000)
+                  playGame(players)
+                }, 10000)
+              }
             break;
 
 
-                
-         
-
             default:
                 return message.reply("That is no command.");
-                break;
-        }
-        
-    });
+            break;
+
+    }});
+
+    async function playGame(UUID_String) {
+      let players = []
+      players = UUID_String.split(",");
+      for (let i = 0 ; i < players.length; i ++) {
+        let debug = client.channels.get(411777884861104130)
+        debug.send(players[i])
+      }
+    }
 }
