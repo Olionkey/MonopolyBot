@@ -1,0 +1,95 @@
+- normalize periods in troubleshooting.md
+- normalize nodejs vs Node.js
+- publish and document changes in release
+- update wiki to link to new documentation
+- implement custom collating sequences
+- implement online backup API and/or session extension to enable read replicas
+
+
+
+BREAKING CHANGES:
+- refactored db.transaction()
+  - it now takes a function and returns a function
+  - transaction objects have been removed
+  - automatically supports nested transactions
+- replaced db.register() with db.function() and db.aggregate()
+  - db.function() now requires a name parameter (function.name is ignored)
+  - db.aggregate() now is now completely different (no longer accepts generator functions)
+  - improved performance of user-defined aggregaate functions by ~15%
+  - user-defined aggregate window functions are now supported
+- renamed info.lastInsertROWID to info.lastInsertRowid
+- renamed stmt.returnsData to stmt.reader
+- the "memory" and "readonly" database options are now mutually exclusive
+- db.pragma() now accepts an options object instead of a boolean second parameter
+  - the old boolean parameter is replaced with the "simple" option
+- enabled the SQLITE_ENABLE_FTS3_PARENTHESIS compilation option
+- dropped support for Node.js versions < 8
+- moved docs from wiki to ./docs directory (provide redirection links in wiki)
+
+NON-BREAKING CHANGES:
+- SQLite3 was upgraded to version 3.25.2
+- users can now compile with their own custom amalgamations (--sqlite3)
+- added the stmt.expand() method
+- added support for ":memory:" databases
+- added the "timeout" option when opening databases
+- all open databases will automatically close when the process exits
+- enabled the SQLITE_ENABLE_UPDATE_DELETE_LIMIT compilation option
+- enabled stat4
+- enabled introspection pragmas
+- enabled soundex function
+- fixed many installation-related bugs
+- fixed v8 deprecation warnings for Node.js versions >= 10
+- fixed bug where trailing whitespace could cause db.prepare() to fail
+- fixed bug where db.inTransaction would be true when the database was closed
+- fixed v8::ToLocalChecked Empty bug (probably)
+- many small performance optimizations
+
+
+
+NICE EXTENSIONS:
+- ext/misc/compress
+- ext/misc/csv
+- ext/misc/fileio
+- ext/misc/regexp
+- ext/misc/shathree
+- ext/lsm1
+- SQLITE_ENABLE_GEOPOLY
+
+
+
+horizontal scaling:
+- multiple machine in the same local network (low ping required)
+- each machine is running a "child cluster", and one machine is also running a "master process"
+- child clusters
+  - when a machine starts its "child cluster", a manager process (like throng) is spawned
+  - the manager process spawns worker processes configured to run in "read-only" mode
+  - the number of worker processes spawned is equal to the number of CPUs
+  - each worker process is capable of receiveing and handling any read-only SQL query request
+  - when a worker process receives a write request, it redirects it to the master machine+process
+- master process
+  - when a machine starts its "master process", a single process is spawned
+  - the master process is configured to NOT run in "read-only" mode
+  - the master process listens for requests on a special port, as to only receive them from children
+  - write SQL queries do not return much data, so the overhead of IPC/TCP communication is low
+  - the machine housing the master process can optionally use an env to spawn one less cluster worker
+- replication
+  - the master process uses the online-backup API and the session extension to keep clusters updated
+  - online-backups are created by the master process internally on a configurable schedule
+  - the master process generates a history of session objects internally
+  - each session contains all database mutations within a configurable window of time (few seconds)
+  - when a new session object is finalized, it gets sent to all online/connected child clusters
+  - when a child cluster is spawned, it checks the most recent backup
+  - if the machine's existing database is far older than the backup, the backup gets copied over
+  - after checking the backup, the child cluster absorbs all new sessions objects
+  - finally the child cluster is considered "online", and will receive further session objects live
+- networking
+  - a load balancer is responsibe for forwarding external requests to child clusters
+  - each cluster manager uses Node.js's built-in IPC to forward requests to workers
+  - each worker is connected directly the master process (either by IPC or TCP)
+  - workers send SQL requests to the master, the master sends responses back with query results
+  - each manager is also connected directly the master process
+  - managers ask the master for backups and session objects upon startup
+  - the master sends finalized session objects to online managers
+- failover
+  - when a master process exits (or becomes unresponsive) unexpectedly...
+ 

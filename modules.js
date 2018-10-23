@@ -33,8 +33,9 @@ exports.getNewCGID = function (CGID){
 }
 
 exports.createChannel = function (message, lobbyName){
+    // Searches for the role needed for the permission for the channels
     let currentRole = message.guild.roles.find(r => r.name === lobbyName);
-    console.log(currentRole);
+    // message.guild.id is @everyone
     message.guild.createChannel(`${lobbyName}`, "text", [{
         id: message.guild.id,
         denied: 'VIEW_CHANNEL'
@@ -43,7 +44,7 @@ exports.createChannel = function (message, lobbyName){
         id: currentRole.id,
         allowed: 'VIEW_CHANNEL'
     }])
-        .then(channel => channel.setParent('504069030727122973'))
+        .then(channel => channel.setParent('504069030727122973')) // Sets it to the category under "Lobbys"
         .catch(console.error)
 }
 
@@ -54,7 +55,8 @@ exports.deleteChannel = function (message, lobbyNumber, all){
         let channel,
             f; // Stores the channel name that needs to be deleted.
         for (let i = 0; i < roles.length ; i ++){
-            f = lobbyNumber[i] = lobbyName[i].substring(0, lobbyName[i].indexOf("#")) + lobbyName[i].substring(lobbyName[i].indexOf("#") + 1);
+            // Removes the hashtag from the lobbyName which is needed to find the channel to delete, # is an illegal character in channel generation
+            f = lobbyName[i].substring(0, lobbyName[i].indexOf("#")) + lobbyName[i].substring(lobbyName[i].indexOf("#") + 1);
             channel = message.guild.channels.find(r => r.name === f);
             channel.delete("All Games Ended")
             .then(deleted => console.log(`Deleted ${deleted.name} because all games have ended.`))
@@ -66,12 +68,12 @@ exports.deleteChannel = function (message, lobbyNumber, all){
             roleNum[i] = roles[i].substring(roles[i].indexOf('#')+1);
         }
         parseInt(roleNum);
-        console.log(roleNum);
+
         for( let i = 0 ; i < roleNum.length; i ++){
             if (roleNum[i] === lobbyNumber){
                 channel = message.guild.channels.find(r => r.name === `lobby${lobbyNumber}`);
                 channel.delete(`Game # ${lobbyNumber} has ended.`)
-                .then(deleted => console.log(`Deleted ${deleted.name} because all games have ended.`))
+                .then(deleted => console.log(`Deleted ${deleted.name} because this game has ended.`))
                 .catch(console.error);
             }
         }
