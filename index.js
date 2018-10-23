@@ -126,10 +126,11 @@ if (cluster.isMaster) {
               // Will create a role with the last number generated.
               message.guild.createRole({
                 name: `lobby#${CGID[CGID.length-1]}`,
-                hoist: true,
-                mentionable: true,
-              })      
-            
+                hoist: false,
+                mentionable: false,
+              })
+                .then( () => roleFunction.createChannel(message, `lobby#${CGID[CGID.length - 1]}`));
+              
             break;
 
             case 'join':
@@ -154,7 +155,7 @@ if (cluster.isMaster) {
                 guildMember.addRole(role).catch(()=>console.error("adding role"));
               }
             
-              if (lobby.length > 1) {
+              if (lobby.length > 0) {
               // If the player count is greater 1 then the game will start in x amount of minutes.
                 setTimeout(function(){
                   let players = ""
@@ -169,16 +170,19 @@ if (cluster.isMaster) {
                   game = false;
                   lobby = [];
                 10}, 6000)
+                }
 
             break;
 
             case 'endgame':
               let roleName;
-              // Searches through CGID to find which lobby to delete, if it does not exist it will thrown an error after the loop ends.
-              for (let i = 0; i < CGID.length; i ++){
-                if (CGID[i] === parseInt(args[0])){
+              let allRoles = [];
+              allRoles = roleFunction.getLobbyNumber(message);
+              // Will serach through all of the roles on the server rather then an array which reset after the bot restart.
+              for (let i = 0; i < allRoles.length; i ++){
+                if (allRoles[i] === parseInt(args[0])){
                   console.log ("Got a match");
-                  roleName = `lobby#${CGID[i]}`;
+                  roleName = `lobby#${allRoles[i]}`;
                   break;
                 }
               }
@@ -191,14 +195,17 @@ if (cluster.isMaster) {
                 role.delete('good night')
                   .then(deleted => console.log (`Deleted role ${deleted.name}`))
                   .catch(console.error);
+              roleFunction.deleteChannel(message, args[0], false)
 
             break;
+
             default:
                 return message.reply("That is no command.");
             break;
                 
             case'endall':
               let lobbyRole = roleFunction.getLobbyRole(message);
+              console.log("I got lobbyRole");
               let rolep = '';
                for(let i = 0 ; i < lobbyRole.length; i ++){
                 rolep = message.guild.roles.find(r => r.name == lobbyRole[i]);
@@ -208,6 +215,7 @@ if (cluster.isMaster) {
               }
               message.channel.send ("All lobby roles have been deleted.");
               game = false;
+              roleFunction.deleteChannel(message,-1,true)
             break;
         }
         
