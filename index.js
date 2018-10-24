@@ -37,8 +37,8 @@ if (cluster.isMaster) {
     const client = new Discord.Client();
     const updateJsonFile = require('update-json-file');
     const cards = require('./persistant_data/MonopolyCards.json');
-    const roleFunction = require('./modules/role.js');
-    const gane         = require('./modules/game.js');
+    const roleFunction = require('./modules/roles.js');
+    const game         = require('./modules/game.js');
 
     let fs = require('fs');
     let gameRun = false;
@@ -130,7 +130,8 @@ if (cluster.isMaster) {
                 hoist: false,
                 mentionable: false,
               })
-                .then( () => roleFunction.createChannel(message, `lobby#${CGID[CGID.length - 1]}`));
+                .then( () => roleFunction.createChannel(message, `lobby#${CGID[CGID.length - 1]}`))
+                .then(() => game.createRoleDB(CGID[CGID.length - 1]));
               
             break;
 
@@ -173,6 +174,11 @@ if (cluster.isMaster) {
                 10}, 6000)
                 }
 
+            break;
+            // only here for testing.
+            case 'makeplayer':
+                game.createPlayer( message, CGID[CGID.length - 1], client );
+                game.testDb();
             break;
 
             case 'endgame':
