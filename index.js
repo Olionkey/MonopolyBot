@@ -37,10 +37,11 @@ if (cluster.isMaster) {
     const client = new Discord.Client();
     const updateJsonFile = require('update-json-file');
     const cards = require('./persistant_data/MonopolyCards.json');
-    const roleFunction = require('./modules.js');
+    const roleFunction = require('./modules/roles.js');
+    const game = require('./modules/game.js');
 
     let fs = require('fs');
-    let game = false;
+    let gameStart = false;
     let playercount = 0;
     let joinable = true;
     let lobby = [],
@@ -115,9 +116,9 @@ if (cluster.isMaster) {
 
             case 's':
             case 'start':
-              if (game)
+              if (gameStart)
                 return message.channel.send("game is already started please don't start another game.");
-              game = true;
+              gameStart = true;
               message.channel.send ("Game has started.")
             
               // Purpose of the loop is to check if the randomly generated CGID has been used yet, if so make a new ID
@@ -136,7 +137,7 @@ if (cluster.isMaster) {
             case 'join':
             case 'play':
               // Checks to see if the game has to started if not then no one can join.
-              if(!game)
+              if(!gameStart)
                 return message.channel.send ("Please start the game before joining.");
               // current max lobby limit is 10, should let the server owner change it in the future.
               if ( lobby.length < 10){
@@ -167,7 +168,7 @@ if (cluster.isMaster) {
                   
                   playGame(players)
                   
-                  game = false;
+                  gameStart = false;
                   lobby = [];
                 10}, 6000)
                 }
@@ -214,7 +215,7 @@ if (cluster.isMaster) {
                   .catch(console.error);
               }
               message.channel.send ("All lobby roles have been deleted.");
-              game = false;
+              gameStart = false;
               roleFunction.deleteChannel(message,-1,true)
             break;
         }
