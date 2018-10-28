@@ -34,17 +34,19 @@ exports.getNewCGID = function (CGID){
 
 exports.createChannel = function (message, lobbyName){
     let currentRole = message.guild.roles.find(r => r.name === lobbyName);
-    console.log(currentRole);
-    message.guild.createChannel(`${lobbyName}`, "text", [{
-        id: message.guild.id,
-        denied: 'VIEW_CHANNEL'
-    },
-    {
-        id: currentRole.id,
-        allowed: 'VIEW_CHANNEL'
-    }])
-        .then(channel => channel.setParent('504069030727122973'))
-        .catch(console.error)
+    message.guild
+      .createChannel(`${lobbyName}`, "text", [
+        {
+          id: message.guild.id,
+          denied: "VIEW_CHANNEL"
+        },
+        {
+          id: currentRole.id,
+          allowed: "VIEW_CHANNEL"
+        }
+      ])
+      .then(channel => channel.setParent("505739385749241857"))
+      .catch(console.error);
 }
 
 exports.deleteChannel = function (message, lobbyNumber, all){
@@ -54,7 +56,7 @@ exports.deleteChannel = function (message, lobbyNumber, all){
         let channel,
             f; // Stores the channel name that needs to be deleted.
         for (let i = 0; i < roles.length ; i ++){
-            f = lobbyNumber[i] = lobbyName[i].substring(0, lobbyName[i].indexOf("#")) + lobbyName[i].substring(lobbyName[i].indexOf("#") + 1);
+            f = lobbyNumber[i] = roles[i].substring(0, roles[i].indexOf("#")) + roles[i].substring(roles[i].indexOf("#") + 1);
             channel = message.guild.channels.find(r => r.name === f);
             channel.delete("All Games Ended")
             .then(deleted => console.log(`Deleted ${deleted.name} because all games have ended.`))

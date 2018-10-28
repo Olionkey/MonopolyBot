@@ -39,6 +39,7 @@ if (cluster.isMaster) {
     const cards = require('./persistant_data/MonopolyCards.json');
     const roleFunction = require('./modules/roles.js');
     const game = require('./modules/game.js');
+    const playerData = require('./modules/playerData.js');
 
     let fs = require('fs');
     let gameStart = false;
@@ -51,6 +52,7 @@ if (cluster.isMaster) {
 
     /*Start bot */
     client.login(auth.token);
+
     client.on("ready", () => {
         console.log(`Bot has started, with ${client.users.size} users, in ${client.channels.size} channels of ${client.guilds.size} guilds.`);
         const member = client.channels.get(config.statusChannelID);
@@ -68,9 +70,12 @@ if (cluster.isMaster) {
 
     /* Will run when it sees a message */
     client.on("message", async message => {
+      // Will read the table for each role tag and put it in lobbies[]; in ./modules/playerdata.js
+      
+
         /* Will ignore it self */
 
-        //if (message.author.bot) return;
+        if (message.author.bot) return;
 
         //Will search for the prefix for the bot to function
         if (message.content.indexOf(config.prefix) !== 0) return;
@@ -89,15 +94,6 @@ if (cluster.isMaster) {
             case 'r':
                 console.log("Reload time!");
                 process.exit(0);
-                break;
-            case 'ping':
-              return message.channel.send("pong");
-            break;
-
-            case 'testcards':
-                var code = "message.channel.send(cards.";
-                code = code + combWord + ")";
-                 eval(code);
             break;
 
             case 'roll':
@@ -122,16 +118,17 @@ if (cluster.isMaster) {
               message.channel.send ("Game has started.")
             
               // Purpose of the loop is to check if the randomly generated CGID has been used yet, if so make a new ID
-              CGID[CGID.length - 1] = roleFunction.getNewCGID(CGID);
-              
+              CGID[CGID.length] = roleFunction.getNewCGID(CGID);
+              let f = CGID[CGID.length-1].toString()
+              console.log(CGID);
               // Will create a role with the last number generated.
               message.guild.createRole({
                 name: `lobby#${CGID[CGID.length-1]}`,
                 hoist: false,
                 mentionable: false,
               })
-                .then( () => roleFunction.createChannel(message, `lobby#${CGID[CGID.length - 1]}`));
-              
+                .then( () => roleFunction.createChannel(message, `lobby#${CGID[CGID.length - 1]}`))
+             
             break;
 
             case 'join':
@@ -154,6 +151,7 @@ if (cluster.isMaster) {
                 let role = message.guild.roles.find(r => r.id !== message.guild.id && r.name == roleName);
 
                 guildMember.addRole(role).catch(()=>console.error("adding role"));
+                playerData.setPlayerData(message, CGID[CGID.length-1].toString());
               }
             
               if (lobby.length > 0) {
@@ -166,7 +164,7 @@ if (cluster.isMaster) {
                   players = players.substring(0, players.length - 1);
                   message.reply("Game has started! Enjoy!!");
                   
-                  playGame(players)
+                  // playGame(players)
                   
                   gameStart = false;
                   lobby = [];
@@ -198,6 +196,7 @@ if (cluster.isMaster) {
                   .catch(console.error);
               roleFunction.deleteChannel(message, args[0], false)
 
+              gameStart = false;
             break;
 
             default:
@@ -208,25 +207,28 @@ if (cluster.isMaster) {
               let lobbyRole = roleFunction.getLobbyRole(message);
               console.log("I got lobbyRole");
               let rolep = '';
-               for(let i = 0 ; i < lobbyRole.length; i ++){
-                rolep = message.guild.roles.find(r => r.name == lobbyRole[i]);
-                rolep.delete('good night')
-                  .then(deleted => console.log(`Deleted role ${deleted.name}`))
-                  .catch(console.error);
-              }
+              roleFunction.deleteChannel(message, -1, true)    
+                for (let i = 0; i < lobbyRole.length; i++) {
+                  rolep = message.guild.roles.find(r => r.name == lobbyRole[i]);
+                  rolep.delete('good night')
+                    .then(deleted => console.log(`Deleted role ${deleted.name}`))
+                    .catch(console.error);
+                }
+          
+
               message.channel.send ("All lobby roles have been deleted.");
               gameStart = false;
-              roleFunction.deleteChannel(message,-1,true)
+              
             break;
         }
         
     });
-      async function playGame(UUID_String) {
-      let players = []
-      players = UUID_String.split(",");
-      for (let i = 0 ; i < players.length; i ++) {
-        let debug = client.channels.get(411777884861104130)
-        debug.send(players[i])
-      }
-    }
+    //   async function playGame(UUID_String) {
+    //   let players = []
+    //   players = UUID_String.split(",");
+    //   for (let i = 0 ; i < players.length; i ++) {
+    //     let debug = client.channels.get(411777884861104130)
+    //     debug.send(players[i])
+    //   }
+    // }
 }
