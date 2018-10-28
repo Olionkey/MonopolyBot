@@ -71,7 +71,7 @@ if (cluster.isMaster) {
     /* Will run when it sees a message */
     client.on("message", async message => {
       // Will read the table for each role tag and put it in lobbies[]; in ./modules/playerdata.js
-      
+
 
         /* Will ignore it self */
 
@@ -116,7 +116,7 @@ if (cluster.isMaster) {
                 return message.channel.send("game is already started please don't start another game.");
               gameStart = true;
               message.channel.send ("Game has started.")
-            
+
               // Purpose of the loop is to check if the randomly generated CGID has been used yet, if so make a new ID
               CGID[CGID.length] = roleFunction.getNewCGID(CGID);
               let f = CGID[CGID.length-1].toString()
@@ -128,7 +128,7 @@ if (cluster.isMaster) {
                 mentionable: false,
               })
                 .then( () => roleFunction.createChannel(message, `lobby#${CGID[CGID.length - 1]}`))
-             
+
             break;
 
             case 'join':
@@ -153,7 +153,7 @@ if (cluster.isMaster) {
                 guildMember.addRole(role).catch(()=>console.error("adding role"));
                 playerData.setPlayerData(message, CGID[CGID.length-1].toString());
               }
-            
+
               if (lobby.length > 0) {
               // If the player count is greater 1 then the game will start in x amount of minutes.
                 setTimeout(function(){
@@ -163,14 +163,19 @@ if (cluster.isMaster) {
                   }
                   players = players.substring(0, players.length - 1);
                   message.reply("Game has started! Enjoy!!");
-                  
+
                   // playGame(players)
-                  
+
                   gameStart = false;
                   lobby = [];
                 10}, 6000)
                 }
 
+            break;
+            // only here for testing.
+            case 'makeplayer':
+                game.createPlayer( message, CGID[CGID.length - 1], client );
+                game.testDb();
             break;
 
             case 'endgame':
@@ -187,8 +192,8 @@ if (cluster.isMaster) {
               }
 
               if (roleName === undefined)
-                return message.channel.send("Sorry that game number does not exist.");      
-              
+                return message.channel.send("Sorry that game number does not exist.");
+
               let role = message.guild.roles.find(r => r.name == roleName);
               // Deletes the roll after it has been found.
                 role.delete('good night')
@@ -202,26 +207,26 @@ if (cluster.isMaster) {
             default:
                 return message.reply("That is no command.");
             break;
-                
+
             case'endall':
               let lobbyRole = roleFunction.getLobbyRole(message);
               console.log("I got lobbyRole");
               let rolep = '';
-              roleFunction.deleteChannel(message, -1, true)    
+              roleFunction.deleteChannel(message, -1, true)
                 for (let i = 0; i < lobbyRole.length; i++) {
                   rolep = message.guild.roles.find(r => r.name == lobbyRole[i]);
                   rolep.delete('good night')
                     .then(deleted => console.log(`Deleted role ${deleted.name}`))
                     .catch(console.error);
                 }
-          
+
 
               message.channel.send ("All lobby roles have been deleted.");
               gameStart = false;
-              
+
             break;
         }
-        
+
     });
     //   async function playGame(UUID_String) {
     //   let players = []
