@@ -188,7 +188,7 @@
         "price": 220,
         "mortage": 110
     },
-    "B&ORailRoad": {
+    "B&ORailroad": {
         "rent": 25,
         "2RR": 50,
         "3RR": 100,
@@ -269,7 +269,7 @@
         "price": 320,
         "mortage": 160
     },
-    "ShortLineRailRoad": {
+    "ShortLineRailroad": {
         "rent": 25,
         "2RR": 50,
         "3RR": 100,
