@@ -95,7 +95,11 @@ if (cluster.isMaster) {
                 console.log("Reload time!");
                 process.exit(0);
             break;
-
+            // for testing
+            case 'g':
+              playerData.setPlayerInJail(message,CGID[CGID.length-1]);
+              //playerData.setBalance(message, CGID[CGID.length - 1]);
+            break;was
             case 'roll':
               let roll1 = Math.floor(Math.random()*7);
               let roll2 = Math.floor(Math.random()*7);
