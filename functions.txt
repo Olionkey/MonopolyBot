@@ -16,7 +16,15 @@ addSnakeEyeCount (message, role);
 getSnakeEyeCount (..Args);
 resetSnakeEyeCount (message, role);
 updateCurrentPos (message, role, rollCount);
+addPlayerBuildings (message, role, property);
+sellPlayerBuildings (message, role, property);
+checkPlayerProperties (message, role, property) || (playerData, property); // Can accept ethier parameter set.
+setPropertyMortage (message, role, property);
+removePropertyMortage (message, role, property);
+checkPropertyMortage (message, role, property) || (playerData, property); // Can accept ethier parameter set.
 findPlayer (message, role);      // Will search through the database and find the player that you are searching for.
+getPlayerInfo (message, role, PropertiesInfo, BuildingsInfo, MortgageInfo) // last three parameters are booleans to see if the player wants them returned.
 updatePlayer (message, role, newPlayerData); // will update the playerData in the database
 sortPlayerDataProperties (playerData); // will sort all arrays dealing with the properties, and calls swapArrayPosition(playerData, i, i +1)
 swapArrayPosition(playerData, index, index + 1); // will do a buble sort for properties.
+

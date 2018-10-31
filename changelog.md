@@ -1,7 +1,17 @@
 # Monopoly Discord Bot
 #### Created by Olionkey, CelluloidRacer2, and ExtraFloofyWooflesIsReal
 
-## [Unrealeased]
+## [] Unreleased
+
+### Added
+- Finished up most of the methods that is left in playerData.js which still needs to be tested.
+- Adding half of the methods that is need in the playerData.js will be adding more in the week.
+
+### Notes
+- Some methods may need some rewritting in the future, to deal with any bugs or any improvements that we may see.
+- Many methods also accept multiple parameters due to *...rest*.
+
+## [0.0.1] Working Database
 
 ### Improved
 - moved around some locations of files.

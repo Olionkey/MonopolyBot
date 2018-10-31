@@ -89,20 +89,22 @@ exports.removePlayerProperties = async function (message, role, propertyName){
         return console.log (`${message.author} does not have ${propertyName} to begin with in game ${role}`);
     else{
         playerData.ownProperties.splice( playerData.ownProperties.indexOf( propertyName ), 1 );
-        playerData.ownBuilding.splice( playerData.ownProperties.indexOf( propertyName ), 1 );
+        playerData.ownBuildings.splice( playerData.ownProperties.indexOf( propertyName ), 1 );
         playerData.ifMortgaged.splice( playerData.ownProperties.indexOf( propertyName ), 1 );
     }
     module.exports.updatePlayer(message, role, PlayerData);
 };
 
 // Returns the index, if the player owns it if not it will return -1.
-exports.checkPlayerProperties = async function (message, role, propertyName){
-    const playerData = await module.exports.findPlayer(message, role);
+exports.checkPlayerProperties = async function (...args){
+    if(args.length === 3)
+        const playerData = await module.exports.findPlayer(args[0], args[1]);
+    
     let playerProperites = playerData.ownProperties;
-    if (playerProperites.indexOf( propertyName ) === -1)
+    if (playerProperites.indexOf( args[2] ) === -1)
         return -1;
     else
-        return playerProperites.indexOf( propertyName );
+        return playerProperites.indexOf( args[2] );
 };
 //Rewrite addMoney, removeMoney to use rest ...foo Check if the first index is a json property before procedding, 
 //If it is not then find the player;
@@ -207,8 +209,154 @@ exports.updateCurrentPos = async function ( message, role, rollCount){
     } else {
         playerData.currentPos += rollCount;
     }
-    await modules.exports.updatePlayer(message, role, playerData);
-}
+    await module.exports.updatePlayer(message, role, playerData);
+};
+// should have it work with X amount but have no time to implement that right now.
+exports.addPlayerBuildings = async function (message, role, property) {
+    const playerData = await module.exports.findPlayer(message, role);
+    if (property.isArray){
+        for (let i = 0 ; i < property.length; i ++)
+            if(await module.exports.checkPlayerBuildings(playerData, property[i]) === 5)
+                i = i; 
+            else{
+                let index = await module.exports.checkPlayerProperties(playerData, property);
+                playerData.ownBuildings[index] += 1;
+            }   
+    } else {
+        if ( await module.exports.checkPlayerBuildings(playerData, property) === 5)
+            return console.log(`${message.author} already has max buildings on ${property}, in game number ${role}`);
+        else{
+            let index = await module.exports.checkPlayerProperties(playerData, property);
+            playerData.ownBuildings[index] +=1;
+        }
+    }
+    await module.exports.updatePlayer(message, role, playerData);
+};
+
+exports.sellPlayerBuildings = async function (message, role, property){
+    const playerData = await module.exports.findPlayer(message, role);
+    if (property.isArray){
+        for (let i = 0 ; i < property.length; i ++){
+            if(await module.exports.checkPlayerBuildings(playerData, property) === 0)
+                i = i;
+            else{
+                let index = await module.exports.checkPlayerProperties(playerData, property)
+                playerData.ownBuildings[index] -= 1;
+            }
+        }
+    } else {
+        if ( await module.exports.checkPlayerBuildings(playerData, property) === 0)
+            return console.log(`${message.author} already has no buildings on ${property}, in game number ${role}`);
+        else {
+            let index = await module.exports.checkPlayerProperties(playerData, property);
+            playerData.ownBuildings[index] -=1;
+        }
+    }
+    await module.exports.updatePlayer(message, role, playerData);
+};
+
+exports.checkPlayerBuildings = async function (...args){
+    if(args.length === 3){
+        let playerData = await module.exports.findPlayer(args[0], args[1]);
+        let index = module.exports.checkPlayerProperties(playerData, args[2]);
+        return playerData.ownBuildings[index]; 
+    } else if (args.length === 2){
+        let index = module.exports.checkPlayerProperties(args[0], args[1]);
+        return args[0].ownBuildings[index];
+    } else
+        return console.log(`I am missing parameters. I only recevied, ${args}`);
+};
+
+exports.setPropertyMortage = async function (message, role, property) {
+    const playerData = await module.exports.findPlayer(message, role);
+    if (property.isArray) {
+        for (let i = 0; i < property.length; i++)
+            if (await module.exports.checkPlayerBuildings(playerData, property[i]))
+                i = i; 
+            else {
+                let index = await module.exports.checkPlayerProperties(playerData, property);
+                playerData.ifMortgaged[index] = true;
+            }
+    } else {
+        if (await module.exports.checkPlayerBuildings(playerData, property))
+            return console.log(`${message.author} already has ${property} mortgaged, in game number ${role}`);
+        else {
+            let index = await module.exports.checkPlayerProperties(playerData, property);
+            playerData.ifMortgaged[index] = true;
+        }
+    }
+    await module.exports.updatePlayer(message, role, playerData);
+};
+
+exports.removePropertyMortage = async function (message, role, property) {
+    const playerData = await module.exports.findPlayer(message, role);
+    if (property.isArray) {
+        for (let i = 0; i < property.length; i++) {
+            if (!(await module.exports.checkPropertyMortage(playerData, property)))
+                i = i;
+            else {
+                let index = await module.exports.checkPlayerProperties(playerData, property)
+                playerData.ifMortgaged[index] = false;
+            }
+        }
+    } else {
+        if (await module.exports.checkPlayerBuildings(playerData, property))
+            return console.log(`${message.author} already has ${property} mortgaged, in game number ${role}`);
+        else {
+            let index = await module.exports.checkPlayerProperties(playerData, property);
+            playerData.ifMortgaged[index] = false;
+        }
+    }
+    await module.exports.updatePlayer(message, role, playerData);
+};
+
+exports.checkPropertyMortage = async function (...args) {
+    if (args.length === 3) {
+        let playerData = await module.exports.findPlayer(args[0], args[1]);
+        let index = module.exports.checkPlayerProperties(playerData, args[2]);
+        return playerData.ifMortgaged[index];
+    } else if (args.length === 2) {
+        let index = module.exports.checkPlayerProperties(args[0], args[1]);
+        return args[0].ifMortgaged[index];
+    } else
+        return console.log(`I am missing parameters. I only recevied, ${args}`);
+};
+
+exports.removeGame = async function (role){
+    const destoryed = await tag.destroy({ where: { role: role } })
+    if(destoryed)
+        return console.log(`game ${role} has been destroyed`);
+    else    
+        return console.log(`game ${role} has not been destroyed`);
+};
+
+exports.removePlayer = async function (message, role){
+    const destroyed = await tag.destory( await module.exports.findPlayer(message, role) );
+    if (destoryed)
+        return console.log(`Player ${message.author} has been removed from game ${role}`);
+    else
+        return console.log(`Player ${message.author} has not been removed from game ${role}`);
+};
+
+/*
+args[0] = message
+args[1] = role
+args[2] = if return ownedProperties
+args[3] = if return ownedBuildings
+args[4] = if return ifMortgage
+*/
+exports.getPlayerInfo = async function (...args){
+    const playerData = await module.exports.findPlayer(args[0], args[1]);
+    let returnValue = [];
+    returnValue[0] = playerData.balance;
+    if(args[2])
+        returnValue.push(playerData.ownProperties);
+    else if (args[3])
+        returnValue.push(playerData.ownBuildings);
+    else if (args[4])
+        returnValue.push(playerData.ifMortgaged);
+    return returnValue;
+};
 
 exports.findPlayer = async function (message, role) {
     const { PlayerData } = await tag.findOne({
@@ -261,3 +409,4 @@ exports.swapArrayPosition = async function (playerData, i, indexB){
     playerData.ownBuildings[indexB] = temp[1];
     playerData.ifMortgaged[indexB] = temp[2];
 };
+
