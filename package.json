@@ -17,8 +17,11 @@
   },
   "homepage": "https://github.com/Olionkey/MonopolyBot#readme",
   "dependencies": {
+    "better-sqlite-pool": "^0.1.2",
     "cluster": "^0.7.7",
     "discord.js": "^11.4.2",
+    "sequelize": "^4.41.0",
+    "sqlite3": "^4.0.3",
     "update-json-file": "^1.1.1"
   },
   "description": ""
