@@ -89,8 +89,21 @@ if (cluster.isMaster) {
         const combWord = args.join('');
         /* what calls the bot for a command */
 
+        const prefix = config.prefix;
 
         switch (command) {
+            case 'h':
+            case 'help':
+              let helpEmbed = new Discord.RichEmbed()
+              .setTitle(`Help`)
+              .addField(`Game Commands`, `**${prefix}start**: Start a game of Monopoly. \n **${prefix}join**: Join a lobby which is about to start.`, true)
+              .setFooter(`Help`, message.author.displayAvatarURL)
+              .setColor(3447003)
+              .setTimestamp(new Date())
+
+              message.channel.send(helpEmbed);
+            break;
+
             case 'r':
                 console.log("Reload time!");
                 process.exit(0);
@@ -131,6 +144,7 @@ if (cluster.isMaster) {
 
             break;
 
+            case 'j':
             case 'join':
             case 'play':
               // Checks to see if the game has to started if not then no one can join.
