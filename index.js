@@ -2,7 +2,9 @@
 /*
  **  This lets the bot to be multi threaded if you want to let it be multi threaded in the future.
  */
+
 var cluster = require('cluster');
+
 /* Check to see if the process is the master */
 if (cluster.isMaster) {
     /* Fork workers. In the future, the plan is to have the bot be multi-threaded */
@@ -13,8 +15,8 @@ if (cluster.isMaster) {
     console.log("Master PID is " + process.pid);
 
     cluster.on('exit', function (deadWorker, code, signal) {
-        /* Restart the worker */
-        var worker = cluster.fork();
+    /* Restart the worker */
+    var worker = cluster.fork();
 
         /* Note the process IDs */
         var newPID = worker.process.pid;
@@ -48,8 +50,6 @@ if (cluster.isMaster) {
     let lobby = [],
         CGID  = []; // Current Game Ids
 
-
-
     /*Start bot */
     client.login(auth.token);
 
@@ -70,11 +70,9 @@ if (cluster.isMaster) {
 
     /* Will run when it sees a message */
     client.on("message", async message => {
-      // Will read the table for each role tag and put it in lobbies[]; in ./modules/playerdata.js
-
+        // Will read the table for each role tag and put it in lobbies[]; in ./modules/playerdata.js
 
         /* Will ignore it self */
-
         if (message.author.bot) return;
 
         //Will search for the prefix for the bot to function
@@ -87,21 +85,20 @@ if (cluster.isMaster) {
         const command = args.shift().toLowerCase();
         const guildMember = message.member; //Helps add roles to users.
         const combWord = args.join('');
-        /* what calls the bot for a command */
-
         const prefix = config.prefix;
 
+        /* what calls the bot for a command */
         switch (command) {
             case 'h':
             case 'help':
-              let helpEmbed = new Discord.RichEmbed()
-              .setTitle(`Help`)
-              .addField(`Game Commands`, `**${prefix}start**: Start a game of Monopoly. \n **${prefix}join**: Join a lobby which is about to start.`, true)
-              .setFooter(`Help`, message.author.displayAvatarURL)
-              .setColor(3447003)
-              .setTimestamp(new Date())
+                let helpEmbed = new Discord.RichEmbed()
+                    .setTitle(`Help`)
+                    .addField(`Game Commands`, `**${prefix}start**: Start a game of Monopoly. \n **${prefix}join**: Join a lobby which is about to start.`, true)
+                    .setFooter(`Help`, message.author.displayAvatarURL)
+                    .setColor(3447003)
+                    .setTimestamp(new Date())
 
-              message.channel.send(helpEmbed);
+                message.channel.send(helpEmbed);
             break;
 
             case 'r':
@@ -110,82 +107,85 @@ if (cluster.isMaster) {
             break;
 
             case 'roll':
-              let roll1 = Math.floor(Math.random()*7);
-              let roll2 = Math.floor(Math.random()*7);
+                let roll1 = Math.floor(Math.random()*7);
+                let roll2 = Math.floor(Math.random()*7);
 
-              if ( roll1 === roll2 ){
-                if (/*add playerSnakeEye count ===  3 */ 1+1 === 3){
-                  //send player to jail.
+                if ( roll1 === roll2 ){
+                    if (/*add playerSnakeEye count ===  3 */ 1+1 === 3){
+                        //send player to jail.
+                    }
+                    // make it their turn again.
+                    return message.reply("You rolled snake eyes, move " + roll1+roll2 + " spaces.");
                 }
-                // make it their turn again.
-                return message.reply("You rolled snake eyes, move " + roll1+roll2 + " spaces.");
-              }
-              message.reply("You have rolled, move " + roll1 + roll2 + " spaces.")
+                message.reply("You have rolled, move " + roll1 + roll2 + " spaces.")
             break;
 
             case 's':
             case 'start':
-              if (gameStart)
-                return message.channel.send("game is already started please don't start another game.");
-              gameStart = true;
-              message.channel.send ("Game has started.")
+                if (gameStart)
+                    return message.channel.send("game is already started please don't start another game.");
 
-              // Purpose of the loop is to check if the randomly generated CGID has been used yet, if so make a new ID
-              CGID[CGID.length] = roleFunction.getNewCGID(CGID);
-              let f = CGID[CGID.length-1].toString()
-              console.log(CGID);
-              // Will create a role with the last number generated.
-              message.guild.createRole({
-                name: `lobby#${CGID[CGID.length-1]}`,
-                hoist: false,
-                mentionable: false,
-              })
+                gameStart = true;
+                message.channel.send ("Game has started.")
+
+                // Purpose of the loop is to check if the randomly generated CGID has been used yet, if so make a new ID
+                CGID[CGID.length] = roleFunction.getNewCGID(CGID);
+                let f = CGID[CGID.length-1].toString()
+                console.log(CGID);
+                // Will create a role with the last number generated.
+                message.guild.createRole({
+                    name: `lobby#${CGID[CGID.length-1]}`,
+                    hoist: false,
+                    mentionable: false,
+                })
                 .then( () => roleFunction.createChannel(message, `lobby#${CGID[CGID.length - 1]}`))
-
             break;
 
             case 'j':
             case 'join':
             case 'play':
-              // Checks to see if the game has to started if not then no one can join.
-              if(!gameStart)
-                return message.channel.send ("Please start the game before joining.");
-              // current max lobby limit is 10, should let the server owner change it in the future.
-              if ( lobby.length < 10){
-                  // goes through the current lobby array to see if the player has joined already or not
-                  for (let i = 0 ; i < lobby.length; i ++)
-                    if(lobby[i] === message.author.id)
-                      return message.reply ("Sorry but you already joined.");
+                // Checks to see if the game has to started if not then no one can join.
+                if(!gameStart)
+                    return message.channel.send ("Please start the game before joining.");
 
-                message.reply ("Welcome to the lobby please wait, while we gather more players!");
-                lobby[lobby.length] = message.author.id;
+                // current max lobby limit is 10, should let the server owner change it in the future.
+                if ( lobby.length < 10){
+                    // goes through the current lobby array to see if the player has joined already or not
+                    for (let i = 0 ; i < lobby.length; i ++)
+                        if(lobby[i] === message.author.id)
+                            return message.reply ("Sorry but you already joined.");
 
-                let roleName = `lobby#${CGID[CGID.length - 1]}`;
-                // Makes sure the guild id and role id do not match. Had some issues where they did.
-                let role = message.guild.roles.find(r => r.id !== message.guild.id && r.name == roleName);
+                    message.reply ("Welcome to the lobby please wait, while we gather more players!");
+                    lobby[lobby.length] = message.author.id;
 
-                guildMember.addRole(role).catch(()=>console.error("adding role"));
-                playerData.setPlayerData(message, CGID[CGID.length-1].toString());
-              }
+                    let roleName = `lobby#${CGID[CGID.length - 1]}`;
+                    // Makes sure the guild id and role id do not match. Had some issues where they did.
+                    let role = message.guild.roles.find(r => r.id !== message.guild.id && r.name == roleName);
 
-              if (lobby.length > 0) {
-              // If the player count is greater 1 then the game will start in x amount of minutes.
-                setTimeout(function(){
-                  let players = ""
-                  for (let i = 0 ; i < lobby.length; i ++) {
-                    players = players + lobby[i] + ","
-                  }
-                  players = players.substring(0, players.length - 1);
-                  message.reply("Game has started! Enjoy!!");
-
-                  // playGame(players)
-
-                  gameStart = false;
-                  lobby = [];
-                10}, 6000)
+                    guildMember.addRole(role).catch(()=>console.error("adding role"));
+                    playerData.setPlayerData(message, CGID[CGID.length-1].toString());
                 }
 
+                if (lobby.length > 0) {
+                    // If the player count is greater 1 then the game will start in x amount of minutes.
+                    setTimeout(function(){
+                        let players = ""
+                        for (let i = 0 ; i < lobby.length; i ++) {
+                            players = players + lobby[i] + ","
+                        }
+
+                    players = players.substring(0, players.length - 1);
+                    message.reply("Game has started! Enjoy!!");
+
+                    // playGame(players)
+
+                    gameStart = false;
+                    lobby = [];
+
+                    10}, 6000)
+                }
             break;
+
             // only here for testing.
             case 'makeplayer':
                 game.createPlayer( message, CGID[CGID.length - 1], client );
@@ -193,61 +193,60 @@ if (cluster.isMaster) {
             break;
 
             case 'endgame':
-              let roleName;
-              let allRoles = [];
-              allRoles = roleFunction.getLobbyNumber(message);
-              // Will serach through all of the roles on the server rather then an array which reset after the bot restart.
-              for (let i = 0; i < allRoles.length; i ++){
-                if (allRoles[i] === parseInt(args[0])){
-                  console.log ("Got a match");
-                  roleName = `lobby#${allRoles[i]}`;
-                  break;
+                let roleName;
+                let allRoles = [];
+                allRoles = roleFunction.getLobbyNumber(message);
+                // Will serach through all of the roles on the server rather then an array which reset after the bot restart.
+                for (let i = 0; i < allRoles.length; i ++){
+                    if (allRoles[i] === parseInt(args[0])){
+                    console.log ("Got a match");
+                    roleName = `lobby#${allRoles[i]}`;
+                    break;
+                    }
                 }
-              }
 
-              if (roleName === undefined)
-                return message.channel.send("Sorry that game number does not exist.");
+                if (roleName === undefined)
+                    return message.channel.send("Sorry that game number does not exist.");
 
-              let role = message.guild.roles.find(r => r.name == roleName);
-              // Deletes the roll after it has been found.
+                let role = message.guild.roles.find(r => r.name == roleName);
+                // Deletes the roll after it has been found.
                 role.delete('good night')
-                  .then(deleted => console.log (`Deleted role ${deleted.name}`))
-                  .catch(console.error);
-              roleFunction.deleteChannel(message, args[0], false)
+                .then(deleted => console.log (`Deleted role ${deleted.name}`))
+                .catch(console.error);
 
-              gameStart = false;
+                roleFunction.deleteChannel(message, args[0], false)
+
+                gameStart = false;
             break;
 
             default:
                 return message.reply("That is no command.");
-            break;
 
             case'endall':
-              let lobbyRole = roleFunction.getLobbyRole(message);
-              console.log("I got lobbyRole");
-              let rolep = '';
-              roleFunction.deleteChannel(message, -1, true)
+                let lobbyRole = roleFunction.getLobbyRole(message);
+                console.log("I got lobbyRole");
+                let rolep = '';
+                roleFunction.deleteChannel(message, -1, true)
+
                 for (let i = 0; i < lobbyRole.length; i++) {
-                  rolep = message.guild.roles.find(r => r.name == lobbyRole[i]);
-                  rolep.delete('good night')
+                    rolep = message.guild.roles.find(r => r.name == lobbyRole[i]);
+                    rolep.delete('good night')
                     .then(deleted => console.log(`Deleted role ${deleted.name}`))
                     .catch(console.error);
                 }
 
-
-              message.channel.send ("All lobby roles have been deleted.");
-              gameStart = false;
-
+                message.channel.send ("All lobby roles have been deleted.");
+                gameStart = false;
             break;
         }
-
     });
-    //   async function playGame(UUID_String) {
-    //   let players = []
-    //   players = UUID_String.split(",");
-    //   for (let i = 0 ; i < players.length; i ++) {
-    //     let debug = client.channels.get(411777884861104130)
-    //     debug.send(players[i])
-    //   }
-    // }
+    
+  //   async function playGame(UUID_String) {
+  //   let players = []
+  //   players = UUID_String.split(",");
+  //   for (let i = 0 ; i < players.length; i ++) {
+  //     let debug = client.channels.get(411777884861104130)
+  //     debug.send(players[i])
+  //   }
+  // }
 }
