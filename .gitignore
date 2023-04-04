@@ -1,7 +1,4 @@
-
-auth.json
+node_modules
+.env
 config.json
-## used to help olionkey map out what functions is used
-##functions.txt
-## used to help Olionkey see what still needs to be made dealing with player data.
-##functionsToMake.txt
+auth.json

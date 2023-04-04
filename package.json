@@ -1,28 +1,15 @@
 {
-  "name": "monopolybot",
+  "name": "uno",
   "version": "1.0.0",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Olionkey/MonopolyBot.git"
-  },
-  "keywords": [],
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Olionkey/MonopolyBot/issues"
-  },
-  "homepage": "https://github.com/Olionkey/MonopolyBot#readme",
   "dependencies": {
-    "better-sqlite-pool": "^0.1.2",
-    "cluster": "^0.7.7",
-    "discord.js": "^11.4.2",
-    "sequelize": "^4.41.0",
-    "sqlite3": "^4.0.3",
-    "update-json-file": "^1.1.1"
-  },
-  "description": ""
+    "discord.js": "^14.8.0",
+    "sequelize": "^6.29.3"
+  }
 }
