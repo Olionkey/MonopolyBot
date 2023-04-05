@@ -6,7 +6,7 @@ const db = new sequelize("database", {
   dialect: "sqlite",
   logging: true,
   operatorsAliases: false,
-  storage: "database.sqlite"
+  storage: "./game_data/playerData.sqlite"
 });
 
 const player = db.define('Data', {
@@ -18,7 +18,7 @@ const player = db.define('Data', {
     type: sequelize.STRING,
     allowNull: false
   },
-  gameId: {
+  gameID: {
     type: sequelize.STRING,
     allowNull: false
   },
@@ -29,45 +29,7 @@ const player = db.define('Data', {
   }
 });
 
-// Sort and properties, then swap properties,buildings and mortgaged
-const sortOwnedProperties = (a, b) => {
-  // get the indexes of A and B in the ownProperties Array
-  const indexA = playerData.ownProperties.indexOf(a);
-  const indexB = playerData.ownProperties.indexOf(b);
-  // Compare Pos of each index
-  const result = a.pos - b.pos;
-  //if b if before a swap it all
-  if (result > 0) {
-    [playerData.ownProperties[indexA], playerData.ownProperties[indexB]] = [
-      playerData.ownProperties[indexB],
-      playerData.ownProperties[indexA]
-    ];
-    [playerData.ownBuildings[indexA], playerData.ownbuildings[indexB]] = [
-      playerData.ownBuildings[indexB],
-      playerData.ownBuildings[indexA]
-    ];
-    [playerData.ifMortgaged[indexA], playerData.ifMortgaged[indexB]] = [
-      playerData.ifMortgaged[indexB],
-      playerData.ifMortgaged[indexA]
-    ];
-  }
-  return result;
-};
-
 player.sync();
-
-/**
- * Helper function to update playerData of a given player
- * @param {Object} _player - Player object
- * @param {Object} updatedPlayerData - New player data
- * @returns {Promise} - Promise that resolves when the update is completed
- */
-async function updatePlayerData(_player, updatedPlayerData) {
-  await _player.update({
-    playerData: updatedPlayerData
-  });
-}
-
 /**
  * @param {Discord.message} message 
  * @param {String} gameId Determine which game the user is currenlty playing in byt the channel it was sent in.
@@ -80,9 +42,7 @@ exports.createPlayer = async function (message, gameId) {
     guild: await message.guild.id,
     gameID: gameId,
     playerData: {
-      ownProperties: [],
-      ownBuildings: [],
-      ifMortgaged: [],
+      properties: [{}],
       balance: 1500,
       chanceCard: [],
       communityChest: [],
@@ -141,34 +101,42 @@ exports.removePlayerInjail = async function (userID, _gameID) {
     return false;
 }
 /**
- * 
  * @param {Discord message} message 
  * @param {String} gameId 
  * @param {String} propertyName 
  * @returns Nothing
  */
 exports.addPlayerProperties = async function (userID, _gameID, propertyName) {
+    // first check if the property is owned by someone
+    const propertyOwner = module.exports.findPropertyOwner( _gameID, propertyName)
+    if ( propertyOwner === null) {
+        return propertyOwner;
+    }
     const _player = await player.findOne({
         where: {
-            user: userID,
+            user: userID, 
             gameID: _gameID
         }
     });
-    let playerProperties = _player.playerData.ownProperties;
-    // This won't do what I originaly was thinking 5 years ago, Create a new method that will either search through all players in a game to see what propeties are owned. or create a new array that keeps track of propeties that are already owned.
-    if (playerProperties.indexOf(propertyName) !== -1) {
-        return console.log("Someone already owns this property");
-    } else {
-        _player.playerData.ownProperties.push(propertyName);
-        _player.playerData.ownBuildings.push(0);
-        _player.playerData.ifMortgaged.push(false);
-    }
-    // Sort the property array,building, and mortgaged so they follow the order of the game board.
-    _player.playerData.ownProperties.sort(sortOwnedProperties);
-    await _player.update({
-        playerData: _player.playerData
-    })
-    _player.save();
+    if ( _player ) {
+        const propertyCard = propertyCards[propertyName];
+        if(propertyCard) {
+            // Add the property to the player properties object
+            // Might need to change later currently it will copy the property to the playerData.properties with also giving it a key named "name: propertyName"
+            const updatedProperties = [..._player.dataValues.playerData.properties, {...propertyCard, name: propertyName }];
+            
+            // Sort the array
+            updatedProperties.sort( ( a,b ) => a.pos - b.pos );
+
+            //update the playerData object
+            const updatePlayerData = {
+                ..._player.dataValues.playerData,
+                properties: updatedProperties
+            };
+            // Update the record
+            _player.update( { playerData: updatePlayerData } )
+        } else { console.log (`${propertyName}: Not found`) }
+    } else { console.log( `${userID}: Not Found\n${_gameID}: Not Found`) }
 }
 /**
  * Only removes the property from the player
@@ -176,15 +144,45 @@ exports.addPlayerProperties = async function (userID, _gameID, propertyName) {
  * @param {String} gameID the gameID
  * @param {String} propertyName the name of the property
  */
-exports.removePlayerProperties = async function (message, gameID, propertyName){
-    let _player             = await module.exports.findPlayer(message, gameID);
-    let playerProperties    = _player.playerData.ownProperties;
-    
-    //check to see if the player even owns the property
-    if ( playerProperties.indexOf( propertyName ) === -1) { return console.log(`${message.author} does not currenlty own ${propertyName} in game ${gameID}`)} 
-    else {
-        _player.playerData.splice( _player.playerData.ownProperties.indexOf( propertyName ));
+exports.removePlayerProperties = async function (userID, _gameID, propertyName){
+    const _player = await player.findOne({
+        where: {
+            user: userID,
+            gameID: _gameID
+        }
+    });
+    if (_player) {
+        // Use the built in filter method in javascript to find and remove the array
+        const updatedProperties = _player.dataVaules.playerData.properties.filter( property => property.name !== propertyName);
+
+        //update the plyaerData object
+        const updatePlayerData = {
+            ..._player.dataVaules.playerData,
+            properties: updatedProperties
+        };
+        // Update the record
+        _player.update( { playerData: updatePlayerData } );
+    } else { console.log(` ${userID}: Not Found\n ${_gameID}: Not Found`) };
+}
+/**
+ * 
+ * @param {String} _gameID 
+ * @param {String} propertyName 
+ * @returns {String | null}
+ */
+exports.finePropertyOwner = async function (_gameID, propertyName){
+    const players = await player.findAll({
+        where: {
+            gameID: _gameID
+        }
+    });
+    for (const playerInstance of players) {
+        const properties = playerInstance.dataValues.playerData.properties;
+        const hasMatchingProperty = properties.some( property => property.name === propertyName)
+
+        if (hasMatchingProperty) return playerInstance.dataValues.user; // Return the user id if someone does own the property
     }
+    return null;
 }
 /**
  * @param {Discord message} message 
@@ -257,7 +255,6 @@ exports.findPlayer = async function (message, _gameID) {
     })
     return _player;
 }
-
 exports.addSnakeEyeCount = async function (message, _gameID) {
     const _player = await player.findOne({
         where: {
@@ -364,3 +361,132 @@ exports.getMoney = async function (playerID, _gameID) {
     });
     return _player.dataValues.playerData.balance;
 }
+/**
+ * 
+ * @param {Discord Message} message 
+ * @param {String} _gameID 
+ * @param {Boolean} propertiesInfo 
+ * @param {Boolean} buildingsInfo 
+ * @param {Boolean} mortgageInfo 
+ * @returns {Object}
+ */
+exports.getPlayerInfo = async function (message, _gameID, propertiesInfo, buildingsInfo, mortgageInfo) {
+    const _player = await player.findOne({
+        where: {
+            user: message.author.id,
+            gameID: _gameID
+        }
+    });
+    const playerData = _player.dataValues.playerData;
+    const result = {};
+
+    if (propertiesInfo) { result.ownProperties = playerData.ownProperties }
+    if (buildingsInfo)  { result.ownBuildings  = playerData.ownBuildings }
+    if (mortgageInfo)   { result.mortgageInfo  = playerData.mortgageInfo }
+    return result;
+}
+/**
+ * 
+ * @param {Discord Message} message 
+ * @param {String} _gameID 
+ */
+exports.resetJailTurns = async function ( message, _gameID) {
+    const _player = player.findOne({
+        where: {
+            useID: await message.author.id,
+            gameID: _gameID
+        }
+    });
+    if (_player) {
+        const updatePlayerData = {
+            ..._player.dataValues.playerData,
+            turnsInJail: 0
+        };
+        _player.update({
+            playerData: updatePlayerData
+        })
+    }
+}
+/**
+ * TODO: Currently this will only deal with houses and it will just keep adding more even after 4 houses have been added, Logic is needed to add 1 hotel and nothing more;
+ * @param {Discord message} message 
+ * @param {String} _gameID 
+ * @param {String} property 
+ * @param {int} amount 
+ */
+exports.addBuildings = async function (message, _gameID, propertyName, buildingsToAdd, isHotel = false) { 
+    const _player = await player.findOne({ 
+        where: {
+            user: message.author.id,
+            gameID: _gameID
+        }
+    });
+    
+    const playerProperties  = _player.dataValues.playerData.properties;
+    const playerBalance     = _player.dataValues.playerData.balance;
+    const propertyCard      = propertyCards[propertyName];
+    const colorGroup        = propertyCard.color;
+    const houseCost         = propertyCard.houseCost;
+    const hotelCost         = propertyCard.hotelCost;
+
+    if (ownsAllColorGroup(colorGroup, playerProperties)) {
+        const propertiesInColorGroup = playerProperties.filter(property => property.color === colorGroup);
+        const buildingCost = houseCost * buildingsToAdd;
+
+        if (playerBalance >= buildingCost) {
+            // Update the buildings on each property then update the user's balance and send back their new balance;
+            while (buildingsToAdd > 0) {
+                // Find the property with the least amount of buildings first to balance all of the buildings
+                let minBuildings = Math.min(...propertiesInColorGroup.map(property => property.buildingAmount));
+
+                const updatedProperties = playerProperties.map(property => {
+                    if (property.color === colorGroup && property.buildingAmount === minBuildings && --buildingsToAdd > 0) {
+                        return {
+                            ...property,
+                            buildingAmount: property.buildingAmount + 1
+                        };
+                    }
+                    return property;
+                });
+
+                await _player.update({
+                    playerData: {
+                        ..._player.dataValues.playerData, 
+                        properties: updatedProperties,
+                        balance: playerBalance - buildingCost
+                    }
+                });
+            }
+        } else {
+            // TODO: Write code that can tell the player how many houses they can afford.
+            throw new Error("Insufficient funds.");
+        }
+    } else {
+        throw new Error("You do not own all properties in the color group.");
+    }
+}
+/**
+ * TODO: Remove this code since propertyCards.json stores how much of each color exists.
+ * @purpose Counts the amount of properties in a color group to check if the player has all of the properties needed to be able to build
+ * @param {String} color 
+ * @returns {Boolean}
+ */
+function countPropertiesInColorGroup ( color ) {
+    return propertyCards.reduce(( count, property ) => {
+        return property.color === color ? count + 1 : count;
+    }, 0);
+};
+/**
+ * @purpose Returns to know if the user has the correct amount of propeties in for that color group
+ * @param {String} color 
+ * @param {Object} playerProperties 
+ * @returns {Boolean}
+ */
+function ownsAllColorGroup( color, playerProperties ){
+    const cardsInColorGroup     = countPropertiesInColorGroup(color);
+    const ownedProps            = playerProperties.reduce(( count, property) => {
+        return property.color === color ? count++ : count;
+    }, 0);
+    // Return if the user has the required amount of cards
+    return cardsInColorGroup === ownedProps; 
+};

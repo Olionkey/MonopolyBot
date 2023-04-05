@@ -5,13 +5,16 @@
         "1h": 10,
         "2h": 30,
         "3h": 90,
-        "4H": 160,
+        "4h": 160,
         "hotel": 250,
         "houseCost": 50,
         "hotelCost": 50,
         "price": 60,
         "mortage": 30,
-        "color": "#551a8b"
+        "color": "#551a8b",
+        "amount": 2,
+        "buildingAmount": 0,
+        "isMortgaged": false
     },
     "BalticAvenue": {
         "pos": 1,
@@ -25,7 +28,10 @@
         "hotelCost": 50,
         "price": 60,
         "mortage": 30,
-        "color": "#551a8b"
+        "color": "#551a8b",
+        "amount": 2,
+        "buildingAmount": 0,
+        "isMortgaged": false
     },
     "ReadingRailroad": {
         "pos": 2,
@@ -35,7 +41,8 @@
         "4RR": 200,
         "price": 200,
         "mortage": 100,
-        "color": "#ffffff"
+        "color": "#ffffff",
+        "isMortgaged": false
     },
     "OrientalAvenue": {
         "pos": 3,
@@ -49,7 +56,10 @@
         "hotelCost": 50,
         "price": 100,
         "mortage": 50,
-        "color": "#add8e6"
+        "color": "#add8e6",
+        "amount": 3,
+        "buildingAmount": 0,
+        "isMortgaged": false
     },
     "VermontAvenue": {
         "pos": 4,
@@ -63,7 +73,10 @@
         "hotelCost": 50,
         "price": 100,
         "mortage": 50,
-        "color": "#add8e6"
+        "color": "#add8e6",
+        "amount": 3,
+        "buildingAmount": 0,
+        "isMortgaged": false
     },
     "ConnecticutAvenue": {
         "pos": 5,
@@ -77,7 +90,10 @@
         "hotelCost": 50,
         "price": 120,
         "mortage": 60,
-        "color": "#add8e6"
+        "color": "#add8e6",
+        "amount": 3,
+        "buildingAmount": 0,
+        "isMortgaged": false
     },
     "St.CharlesPlace": {
         "pos": 6,
@@ -91,13 +107,17 @@
         "hotelCost": 100,
         "price": 140,
         "mortage": 70,
-        "color": "#993366"
+        "color": "#993366",
+        "amount": 3,
+        "buildingAmount": 0,
+        "isMortgaged": false
     },
     "EletricCompany": {
         "pos": 7,
         "price": 150,
         "mortage": 75,
-        "color": "#ffffff"
+        "color": "#ffffff",
+        "isMortgaged": false
     },
     "StatesAvenue": {
         "pos": 8,
@@ -111,7 +131,10 @@
         "hotelCost": 100,
         "price": 140,
         "mortage": 70,
-        "color": "#993366"
+        "color": "#993366",
+        "amount": 3,
+        "buildingAmount": 0,
+        "isMortgaged": false
     },
     "VirginiaAvenue": {
         "pos": 9,
@@ -125,7 +148,10 @@
         "hotelCost": 100,
         "price": 160,
         "mortage": 80,
-        "color": "#993366"
+        "color": "#993366",
+        "amount": 3,
+        "buildingAmount": 0,
+        "isMortgaged": false
     },
     "PennsylvaniaRailroad": {
         "pos": 10,
@@ -135,7 +161,8 @@
         "4RR": 200,
         "price": 200,
         "mortage": 100,
-        "color": "#ffffff"
+        "color": "#ffffff",
+        "isMortgaged": false
     },
     "St.JamesPlace": {
         "pos": 11,
@@ -149,7 +176,10 @@
         "hotelCost": 100,
         "price": 180,
         "mortage": 90,
-        "color": "#ffc031"
+        "color": "#ffc031",
+        "amount": 3,
+        "buildingAmount": 0,
+        "isMortgaged": false
     },
     "TennesseeAvenue": {
         "pos": 12,
@@ -163,7 +193,10 @@
         "hotelCost": 100,
         "price": 180,
         "mortage": 90,
-        "color": "#ffc031"
+        "color": "#ffc031",
+        "amount": 3,
+        "buildingAmount": 0,
+        "isMortgaged": false
     },
     "NewYorkAvenue": {
         "pos": 13,
@@ -177,7 +210,10 @@
         "hotelCost": 100,
         "price": 180,
         "mortage": 100,
-        "color": "#ffc031"
+        "color": "#ffc031",
+        "amount": 3,
+        "buildingAmount": 0,
+        "isMortgaged": false
     },
     "KentuckyAvenue": {
         "pos": 14,
@@ -191,7 +227,10 @@
         "hotelCost": 150,
         "price": 220,
         "mortage": 110,
-        "color": "#ff1919"
+        "color": "#ff1919",
+        "amount": 3,
+        "buildingAmount": 0,
+        "isMortgaged": false
     },
     "IndianaAvenue": {
         "pos": 15,
@@ -205,7 +244,10 @@
         "hotelCost": 150,
         "price": 220,
         "mortage": 110,
-        "color": "#ff1919"
+        "color": "#ff1919",
+        "amount": 3,
+        "buildingAmount": 0,
+        "isMortgaged": false
     },
     "IllinoisAvenue": {
         "pos": 16,
@@ -219,7 +261,10 @@
         "hotelCost": 150,
         "price": 220,
         "mortage": 110,
-        "color": "#ff1919"
+        "color": "#ff1919",
+        "amount": 3,
+        "buildingAmount": 0,
+        "isMortgaged": false
     },
     "B&ORailroad": {
         "pos": 17,
@@ -229,7 +274,8 @@
         "4RR": 200,
         "price": 200,
         "mortage": 100,
-        "color": "#ffffff"
+        "color": "#ffffff",
+        "isMortgaged": false
     },
     "AtlanticAvenue": {
         "pos": 18,
@@ -243,13 +289,17 @@
         "hotelCost": 150,
         "price": 260,
         "mortage": 130,
-        "color": "#ffff33"
+        "color": "#ffff33",
+        "amount": 3,
+        "buildingAmount": 0,
+        "isMortgaged": false
     },
     "WaterWorks":{
         "pos": 19,
         "price": 150,
         "mortgage": 75,
-        "color": "#ffffff"
+        "color": "#ffffff",
+        "isMortgaged": false
     },
     "VentorAvenue": {
         "pos": 20,
@@ -263,7 +313,10 @@
         "hotelCost": 150,
         "price": 260,
         "mortage": 130,
-        "color": "#ff1919"
+        "color": "#ff1919",
+        "amount": 3,
+        "buildingAmount": 0,
+        "isMortgaged": false
     },
     "MarvinGardens": {
         "pos": 21,
@@ -277,7 +330,9 @@
         "hotelCost": 150,
         "price": 280,
         "mortage": 140,
-        "color": "#ff1919"
+        "color": "#ff1919",
+        "amount": 3,
+        "buildingAmount": 0
     },
     "PacificAvenue": {
         "pos": 22,
@@ -291,7 +346,10 @@
         "hotelCost": 200,
         "price": 300,
         "mortage": 150,
-        "color": "#268026"
+        "color": "#268026",
+        "amount": 3,
+        "buildingAmount": 0,
+        "isMortgaged": false
     },
     "NorthCarolinaAvenue": {
         "pos": 23,
@@ -305,7 +363,10 @@
         "hotelCost": 200,
         "price": 300,
         "mortage": 150,
-        "color": "#268026"
+        "color": "#268026",
+        "amount": 3,
+        "buildingAmount": 0,
+        "isMortgaged": false
     },
     "PennsylvaniaAvenue": {
         "pos": 24,
@@ -319,7 +380,10 @@
         "hotelCost": 200,
         "price": 320,
         "mortage": 160,
-        "color": "#268026"
+        "color": "#268026",
+        "amount": 3,
+        "buildingAmount": 0,
+        "isMortgaged": false
     },
     "ShortLineRailroad": {
         "pos": 25,
@@ -329,7 +393,8 @@
         "4RR": 200,
         "price": 200,
         "mortage": 100,
-        "color": "#ffffff"
+        "color": "#ffffff",
+        "isMortgaged": false
     },
     "ParkPlace": {
         "pos": 26,
@@ -343,7 +408,10 @@
         "hotelCost": 200,
         "price": 350,
         "mortage": 175,
-        "color": "#007bc6"
+        "color": "#007bc6",
+        "amount": 2,
+        "buildingAmount": 0,
+        "isMortgaged": false
     },
     "Boardwalk": {
         "pos": 27,
@@ -357,6 +425,9 @@
         "hotelCost": 200,
         "price": 350,
         "mortage": 400,
-        "color": "#007bc6"
+        "color": "#007bc6",
+        "amount": 2,
+        "buildingAmount": 0,
+        "isMortgaged": false
     }
 }
