@@ -97,8 +97,7 @@ exports.removePlayerInjail = async function (userID, _gameID) {
             playerData: updatePlayerData
         });
         return true;
-    }
-    return false;
+    } return false;
 }
 /**
  * @param {Discord message} message 
@@ -370,7 +369,7 @@ exports.getMoney = async function (playerID, _gameID) {
  * @param {Boolean} mortgageInfo 
  * @returns {Object}
  */
-exports.getPlayerInfo = async function (message, _gameID, propertiesInfo, buildingsInfo, mortgageInfo) {
+exports.getPlayerInoro = async function (message, _gameID, propertiesInfo, buildingsInfo, mortgageInfo) {
     const _player = await player.findOne({
         where: {
             user: message.author.id,
@@ -458,13 +457,39 @@ exports.addBuildings = async function (message, _gameID, propertyName, buildings
                 });
             }
         } else {
-            // TODO: Write code that can tell the player how many houses they can afford.
+            // TODO: Write code that can tell the player how many houses they can afrrd.
             throw new Error("Insufficient funds.");
         }
     } else {
         throw new Error("You do not own all properties in the color group.");
     }
 }
+exports.sellBuildings = async function (message, _gameID, propertyName, BuildingsToRemove) { 
+    const _player = await player.findOne({
+        where: {
+            user: message.author.id,
+            gameID: _gameID
+        }
+    });
+    const totalBuildings = module.exports.getBuildingAmount(message, _gameID, propertyName);
+    
+
+}
+epoxrts.getBuildingAmount = async function (message, _gameID, propertyName) {
+    const _player = await player.findOne({
+        where: {
+            user: message.author.id,
+            gameID: _gameID
+        }
+    })
+    
+    const playerProperties = _player.dataValues.playerData.properties;
+    const colorProp        = playerProperties.filter(prop => prop.color === propertyCards[propertyName].color);
+    let totalBuildings     = 0;
+    for (const prop of colorProp) { totalBuildings += prop.buildingAmount }
+    return totalBuildings;
+    }
+
 /**
  * TODO: Remove this code since propertyCards.json stores how much of each color exists.
  * @purpose Counts the amount of properties in a color group to check if the player has all of the properties needed to be able to build
@@ -477,7 +502,7 @@ function countPropertiesInColorGroup ( color ) {
     }, 0);
 };
 /**
- * @purpose Returns to know if the user has the correct amount of propeties in for that color group
+ * @purpose Returns to know if the user has the correct amount of propeties in (for) that color group
  * @param {String} color 
  * @param {Object} playerProperties 
  * @returns {Boolean}
@@ -490,3 +515,4 @@ function ownsAllColorGroup( color, playerProperties ){
     // Return if the user has the required amount of cards
     return cardsInColorGroup === ownedProps; 
 };
+
